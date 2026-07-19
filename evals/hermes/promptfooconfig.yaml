@@ -13,10 +13,12 @@ prompts:
     config:
       okf: variants/hermes/candidate-a.md
 
-# Systems under test. The provider set is templated: default "cloud" (anthropic +
-# openrouter). The CI fabric job sets PROVIDER_SET=local to run the local fabric.
+# Systems under test: a Claude-family and an OpenAI-family model, both through
+# OpenRouter, so the whole matrix runs on one funded key (local and CI alike).
+# To evaluate against the direct Anthropic API or the local fabric instead, point
+# this at providers/cloud.yaml or providers/local.yaml (see those files).
 providers:
-  - "file://../../providers/{{ env.PROVIDER_SET | default('cloud') }}.yaml"
+  - file://../../providers/openrouter.yaml
 
 defaultTest:
   options:

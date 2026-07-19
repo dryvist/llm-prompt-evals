@@ -26,10 +26,14 @@ Rules for anyone (human or agent) working in this repo. Distilled from
 
 ## Running an eval
 
+Tooling comes from the Nix dev shell — never `npm install`. `promptfoo` is
+provided by the flake (nixpkgs), alongside `python3` and `node`.
+
 ```bash
-npm ci
-git submodule update --init            # fetch the pinned catalog
-cp .env.example .env                    # fill in your keys
-npm run eval                            # promptfoo eval on the hermes suite
-npm run report                          # render output/latest.{json,html} + summary
+direnv allow           # dev shell: promptfoo, python, node (no npm)
+git submodule update --init   # fetch the pinned catalog
+cp .env.example .env   # add OPENROUTER_API_KEY
+promptfoo eval -c evals/hermes/promptfooconfig.yaml
+promptfoo view         # the visual pass/fail report in a browser
+./scripts/report.sh    # or write output/latest.{json,html} + a summary
 ```
