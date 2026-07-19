@@ -1,0 +1,65 @@
+# OpenRouter-only provider set for CI. Both a Claude-family and an OpenAI-family
+# model run through OpenRouter, so the cloud job gets a cross-family matrix on the
+# single funded OPENROUTER_API_KEY. The direct anthropic: provider (providers/
+# cloud.yaml) needs a real Anthropic API key and is used for local full runs.
+#
+# Both carry the tool registry (OpenAI function format) matching the tool_call
+# probes: get_weather(location), search_docs(query).
+
+- id: openrouter:anthropic/claude-haiku-4.5
+  label: openrouter-claude-haiku-4.5
+  config:
+    temperature: 0
+    tools:
+      - type: function
+        function:
+          name: get_weather
+          description: Get the current weather for a named location.
+          parameters:
+            type: object
+            properties:
+              location:
+                type: string
+                description: "City name, e.g. 'Portland'"
+            required: [location]
+            additionalProperties: false
+      - type: function
+        function:
+          name: search_docs
+          description: Full-text search over the internal documentation index.
+          parameters:
+            type: object
+            properties:
+              query:
+                type: string
+            required: [query]
+            additionalProperties: false
+
+- id: openrouter:openai/gpt-4o-mini
+  label: openrouter-gpt-4o-mini
+  config:
+    temperature: 0
+    tools:
+      - type: function
+        function:
+          name: get_weather
+          description: Get the current weather for a named location.
+          parameters:
+            type: object
+            properties:
+              location:
+                type: string
+                description: "City name, e.g. 'Portland'"
+            required: [location]
+            additionalProperties: false
+      - type: function
+        function:
+          name: search_docs
+          description: Full-text search over the internal documentation index.
+          parameters:
+            type: object
+            properties:
+              query:
+                type: string
+            required: [query]
+            additionalProperties: false

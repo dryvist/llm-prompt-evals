@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+#
+# Fabric variant of promptfooconfig.yaml: the same prompts, tests, and grader,
+# but run against the local OpenAI-compatible fabric (providers/local.yaml).
+# The CI fabric job and any local fabric run use this file.
+#
+# Keep prompts / defaultTest / tests IN SYNC with promptfooconfig.yaml — only the
+# providers line differs. (promptfoo has no config inheritance, hence the copy.)
+description: "Hermes system prompt — local fabric"
+
+prompts:
+  - id: file://../../prompts/load_okf.py:load_prompt
+    label: hermes-canonical
+    config:
+      okf: catalog/auto-ai-agent/hermes.md
+  - id: file://../../prompts/load_okf.py:load_prompt
+    label: hermes-candidate-a
+    config:
+      okf: variants/hermes/candidate-a.md
+
+providers:
+  - file://../../providers/local.yaml
+
+defaultTest:
+  options:
+    provider:
+      id: openrouter:mistralai/mistral-small-24b-instruct-2501
+      config:
+        temperature: 0
+
+tests:
+  - file://tests.yaml
+  - file://../../datasets/reasoning.yaml
+  - file://../../datasets/instruction.yaml
+  - file://../../datasets/homelab_qa.yaml
+  - file://../../datasets/tool_call.yaml

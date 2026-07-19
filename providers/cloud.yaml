@@ -1,0 +1,63 @@
+# Cloud providers: the systems under test. Referenced from evals/*/promptfooconfig.yaml.
+#
+# Both carry the same two-tool registry as the mlx-benchmarks tool_call probes:
+#   get_weather(location)  and  search_docs(query)  — both required-arg.
+# The registry is written in each provider's native shape (Anthropic input_schema
+# vs OpenAI function/parameters). A call to a tool that is not here, or a call
+# that omits a required arg, is a fabrication the tool_call negative bank must FAIL.
+#
+# Keys come from the environment (ANTHROPIC_API_KEY / OPENROUTER_API_KEY). None
+# are committed. The llm-rubric grader is pinned in the eval's defaultTest, not here.
+
+- id: anthropic:messages:claude-haiku-4-5
+  label: anthropic-haiku
+  config:
+    max_tokens: 1024
+    temperature: 0
+    tools:
+      - name: get_weather
+        description: Get the current weather for a named location.
+        input_schema:
+          type: object
+          properties:
+            location:
+              type: string
+              description: "City name, e.g. 'Portland'"
+          required: [location]
+      - name: search_docs
+        description: Full-text search over the internal documentation index.
+        input_schema:
+          type: object
+          properties:
+            query:
+              type: string
+          required: [query]
+
+- id: openrouter:openai/gpt-4o-mini
+  label: openrouter-gpt-4o-mini
+  config:
+    temperature: 0
+    tools:
+      - type: function
+        function:
+          name: get_weather
+          description: Get the current weather for a named location.
+          parameters:
+            type: object
+            properties:
+              location:
+                type: string
+                description: "City name, e.g. 'Portland'"
+            required: [location]
+            additionalProperties: false
+      - type: function
+        function:
+          name: search_docs
+          description: Full-text search over the internal documentation index.
+          parameters:
+            type: object
+            properties:
+              query:
+                type: string
+            required: [query]
+            additionalProperties: false

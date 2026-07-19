@@ -1,0 +1,23 @@
+# Ported from mlx-benchmarks configs/promptstack/probes/reasoning.json.
+# Deterministic: the exact answer must appear as a standalone number token.
+
+- description: "reasoning-001"
+  vars:
+    input: "A server processes 240 requests in 15 minutes at a constant rate. How many requests does it process in 40 minutes? Reply with only the number."
+  assert:
+    - type: regex
+      value: '\b640\b'
+
+- description: "reasoning-002"
+  vars:
+    input: "A cluster has 3 nodes. Two nodes are running 8 jobs each and the third node is running 5 jobs. How many jobs are running in total? Reply with only the number."
+  assert:
+    - type: regex
+      value: '\b21\b'
+
+- description: "reasoning-003"
+  vars:
+    input: "A benchmark repeats each of 4 probe classes 3 times, once for each of 2 prompt variants. How many total probe requests does that make? Reply with only the number."
+  assert:
+    - type: regex
+      value: '\b24\b'
