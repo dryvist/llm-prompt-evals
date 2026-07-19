@@ -1,0 +1,36 @@
+# Ported from mlx-benchmarks configs/promptstack/probes/instruction.json.
+# Each JSON constraint maps to a deterministic JavaScript assertion.
+# promptfoo evaluates the value as an expression, so no `return`.
+
+- description: "instruction-001 — exactly two lowercase words, no punctuation"
+  vars:
+    input: "Reply with exactly two words, both lowercase, no punctuation."
+  assert:
+    - type: javascript   # word_count: 2
+      value: |
+        output.trim().split(/\s+/).filter(Boolean).length === 2
+    - type: javascript   # lowercase_only
+      value: |
+        !/[A-Z]/.test(output.trim())
+    - type: javascript   # no_punctuation
+      value: |
+        !/[^\w\s]/.test(output.trim())
+
+- description: "instruction-002 — exactly 3 lines, no numbering or bullets"
+  vars:
+    input: "List exactly 3 fruits, one per line, with no numbering or bullets."
+  assert:
+    - type: javascript   # line_count: 3
+      value: |
+        output.trim().split(/\n/).filter((l) => l.trim()).length === 3
+    - type: javascript   # no_numbering_prefix
+      value: |
+        !output.split(/\n/).some((l) => /^\s*(\d+[.)]|[-*•])/.test(l))
+
+- description: "instruction-003 — answer only yes or no"
+  vars:
+    input: "Answer only 'yes' or 'no' to this question, nothing else: is 4 an even number?"
+  assert:
+    - type: javascript   # exact_match_ci: [yes, no]
+      value: |
+        ['yes', 'no'].includes(output.trim().toLowerCase().replace(/[^a-z]/g, ''))

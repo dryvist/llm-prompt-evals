@@ -1,0 +1,78 @@
+name: eval
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Cloud-provider evaluation (anthropic + openrouter). Secrets are exposed here,
+  # so this job runs ONLY on same-repo pull requests — fork PRs never reach it.
+  cloud:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # promptfoo-action posts the results comment
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/cache@v4
+        with:
+          path: .promptfoo-cache
+          key: ${{ runner.os }}-promptfoo-${{ hashFiles('evals/**', 'datasets/**', 'providers/**', 'prompts/**', 'variants/**', '.gitmodules') }}
+          restore-keys: ${{ runner.os }}-promptfoo-
+      - uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # The default config runs two models (Claude + OpenAI family) through
+          # OpenRouter — no usable direct-Anthropic credential exists in the org
+          # secrets (the OAuth token is prohibited in CI; GH_ACTION_AI_API_KEY is a
+          # proxy key). See providers/openrouter.yaml.
+          config: evals/hermes/promptfooconfig.yaml
+          cache-path: .promptfoo-cache
+          # Pin to the version the dev shell provides (nixpkgs), so local and CI match.
+          promptfoo-version: 0.118.14
+          use-config-prompts: true
+          force-run: true
+          # A gate, not a wall: model-specific quirks (an arithmetic slip, JSON in
+          # a code fence) stay visible in the report without blocking the merge.
+          fail-on-threshold: 85
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+  # Local fabric evaluation on the self-hosted homelab runner. The fabric base
+  # URL and model come only from the runner environment — never from the repo.
+  # Gated to same-repo trigger events (push / dispatch / a labeled same-repo PR).
+  fabric:
+    if: >-
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.action == 'labeled' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: [self-hosted, Linux]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: promptfoo/promptfoo-action@04839e664f52212b877170219dab0d7ad2bf6440 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # The fabric config points at providers/local.yaml (the local fabric).
+          config: evals/hermes/promptfooconfig.fabric.yaml
+          cache-path: .promptfoo-cache
+          promptfoo-version: 0.118.14
+          use-config-prompts: true
+          force-run: true
+          disable-comment: true
+          fail-on-threshold: 85
+        env:
+          # LOCAL_FABRIC_BASE_URL and LOCAL_FABRIC_MODEL are inherited from the
+          # runner's own environment. OPENROUTER_API_KEY drives the llm-rubric grader.
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}

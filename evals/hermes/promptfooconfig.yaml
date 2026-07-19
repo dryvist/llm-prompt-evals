@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Hermes system prompt — canonical vs candidate-a"
+
+# Two prompts, same loader, different OKF source. load_okf strips frontmatter and
+# returns the system prompt; the test's `input` var becomes the user turn.
+prompts:
+  - id: file://../../prompts/load_okf.py:load_prompt
+    label: hermes-canonical
+    config:
+      okf: catalog/auto-ai-agent/hermes.md
+  - id: file://../../prompts/load_okf.py:load_prompt
+    label: hermes-candidate-a
+    config:
+      okf: variants/hermes/candidate-a.md
+
+# Systems under test: a Claude-family and an OpenAI-family model, both through
+# OpenRouter, so the whole matrix runs on one funded key (local and CI alike).
+# To evaluate against the direct Anthropic API or the local fabric instead, point
+# this at providers/cloud.yaml or providers/local.yaml (see those files).
+providers:
+  - file://../../providers/openrouter.yaml
+
+defaultTest:
+  options:
+    # llm-rubric grader: a pinned cheap OpenRouter model. Kept separate from the
+    # systems under test so grading cost and behavior are stable.
+    provider:
+      id: openrouter:mistralai/mistral-small-24b-instruct-2501
+      config:
+        temperature: 0
+
+# The curated hermes suite plus the ported mlx-benchmarks probe banks.
+tests:
+  - file://tests.yaml
+  - file://../../datasets/reasoning.yaml
+  - file://../../datasets/instruction.yaml
+  - file://../../datasets/homelab_qa.yaml
+  - file://../../datasets/tool_call.yaml

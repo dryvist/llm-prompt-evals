@@ -1,0 +1,44 @@
+# Ported from mlx-benchmarks configs/promptstack/probes/homelab_qa.json.
+# Closed-book grounded QA: answer only from the inline evidence bundle.
+# expected_facts -> must all appear; forbidden_terms -> none may appear
+# (the forbidden list is the hallucination trap of plausible-but-wrong values).
+# JS asserts are expressions (no `return`).
+
+- description: "homelab_qa-001"
+  vars:
+    input: |
+      Evidence bundle: Service 'ingest-gateway' listens on port 8080 and is owned by team Blue. It has no public exposure.
+
+      Using only the evidence bundle above, what port does ingest-gateway listen on, and which team owns it?
+  assert:
+    - type: icontains-all
+      value: ["8080", "blue"]
+    - type: javascript   # forbidden_terms must not appear
+      value: |
+        !['9090', 'green', 'red', 'public'].some((t) => output.toLowerCase().includes(t))
+
+- description: "homelab_qa-002"
+  vars:
+    input: |
+      Evidence bundle: The scheduled backup job runs at 02:30 and writes to the 'bulk' storage pool. It has never failed in the last 30 days.
+
+      Using only the evidence bundle above, when does the scheduled backup run and where does it write?
+  assert:
+    - type: icontains-all
+      value: ["02:30", "bulk"]
+    - type: javascript
+      value: |
+        !['03:00', 'fast', 'failed'].some((t) => output.toLowerCase().includes(t))
+
+- description: "homelab_qa-003"
+  vars:
+    input: |
+      Evidence bundle: The promptstack suite's adoption rule requires task success and tool-call validity to be at least as good as the current prompt, at no more tokens.
+
+      Using only the evidence bundle above, what two conditions must hold for a prompt variant to be adopted?
+  assert:
+    - type: icontains-all
+      value: ["task success", "tool-call validity"]
+    - type: javascript
+      value: |
+        !['latency', 'cost', 'user approval'].some((t) => output.toLowerCase().includes(t))
