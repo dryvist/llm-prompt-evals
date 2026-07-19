@@ -33,11 +33,16 @@ jobs:
           cache-path: .promptfoo-cache
           use-config-prompts: true
           force-run: true
-          # GH_ACTION_AI_API_KEY is the org's real Anthropic API key (x-api-key),
-          # not the Claude Code OAuth token — OAuth tokens are prohibited in
-          # unattended CI and would not authenticate the Messages API anyway.
-          anthropic-api-key: ${{ secrets.GH_ACTION_AI_API_KEY }}
+          # A gate, not a wall: model-specific quirks (an arithmetic slip, JSON in
+          # a code fence) stay visible in the report without blocking the merge.
+          fail-on-threshold: 85
         env:
+          # OpenRouter-only in CI. No usable direct-Anthropic credential exists in
+          # the org secrets (the OAuth token is prohibited in CI; GH_ACTION_AI_API_KEY
+          # is a proxy key), so a Claude-family and an OpenAI-family model both run
+          # through OpenRouter. See providers/openrouter.yaml. The direct anthropic:
+          # provider in providers/cloud.yaml is for local runs with a real key.
+          PROVIDER_SET: openrouter
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
   # Local fabric evaluation on the self-hosted homelab runner. The fabric base
@@ -62,6 +67,7 @@ jobs:
           use-config-prompts: true
           force-run: true
           disable-comment: true
+          fail-on-threshold: 85
         env:
           # PROVIDER_SET selects providers/local.yaml. LOCAL_FABRIC_BASE_URL and
           # LOCAL_FABRIC_MODEL are inherited from the runner's own environment.
