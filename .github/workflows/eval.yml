@@ -3,8 +3,6 @@ name: eval
 on:
   pull_request:
     types: [opened, synchronize, reopened, labeled]
-  push:
-    branches: [develop, main]
   workflow_dispatch:
 
 permissions:
@@ -49,12 +47,13 @@ jobs:
 
   # Local fabric evaluation on the self-hosted homelab runner. The fabric base
   # URL and model come only from the runner environment — never from the repo.
-  # Gated to same-repo trigger events (push / dispatch / a labeled same-repo PR).
+  # Explicit triggers only — manual dispatch, or the `eval-fabric` label on a
+  # same-repo PR — so it never queues a stuck run while the runner is offline.
   fabric:
     if: >-
-      github.event_name == 'push' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' && github.event.action == 'labeled' &&
+       github.event.label.name == 'eval-fabric' &&
        github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: [self-hosted, Linux]
     steps:
