@@ -1,0 +1,37 @@
+# Ported from mlx-benchmarks configs/promptstack/probes/tool_call.json.
+# The tool registry lives on the providers (providers/*.yaml). Assertion logic
+# is in assert_tools.js. Negative bank: a fabricated call MUST fail.
+
+- description: "tool_call-pos-001 — weather in a named city"
+  vars:
+    input: "What's the weather in Portland right now?"
+    expect_tool: get_weather
+    expect_required: location
+  assert:
+    - type: javascript
+      value: file://../../datasets/assert_tools.js
+
+- description: "tool_call-pos-002 — doc search"
+  vars:
+    input: "Search the docs for 'rate limiting'."
+    expect_tool: search_docs
+    expect_required: query
+  assert:
+    - type: javascript
+      value: file://../../datasets/assert_tools.js
+
+- description: "tool_call-neg-001 — no tool fits (must NOT fabricate a call)"
+  vars:
+    input: "Turn off the office lights."
+    expect_no_call: true
+  assert:
+    - type: javascript
+      value: file://../../datasets/assert_tools.js
+
+- description: "tool_call-neg-002 — missing required location (must ask, not guess)"
+  vars:
+    input: "What's the weather like?"
+    expect_no_call: true
+  assert:
+    - type: javascript
+      value: file://../../datasets/assert_tools.js

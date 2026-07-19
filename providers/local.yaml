@@ -1,0 +1,38 @@
+# Local fabric: an OpenAI-compatible endpoint. Base URL and model come from the
+# environment, never committed. promptfoo renders this file with nunjucks, so
+# {{ env.VAR }} reads the runner/.env value at load time.
+#
+# ponytail: the model id is templated from LOCAL_FABRIC_MODEL; if a promptfoo
+# version stops interpolating the provider id, set OPENAI_BASE_URL + a fixed id
+# instead. The local run is optional ("if reachable"), so this stays minimal.
+
+- id: "openai:chat:{{ env.LOCAL_FABRIC_MODEL }}"
+  label: local-fabric
+  config:
+    apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL }}"
+    apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
+    temperature: 0
+    tools:
+      - type: function
+        function:
+          name: get_weather
+          description: Get the current weather for a named location.
+          parameters:
+            type: object
+            properties:
+              location:
+                type: string
+                description: "City name, e.g. 'Portland'"
+            required: [location]
+            additionalProperties: false
+      - type: function
+        function:
+          name: search_docs
+          description: Full-text search over the internal documentation index.
+          parameters:
+            type: object
+            properties:
+              query:
+                type: string
+            required: [query]
+            additionalProperties: false

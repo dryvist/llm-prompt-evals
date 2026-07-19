@@ -1,0 +1,66 @@
+name: eval
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # Cloud-provider evaluation (anthropic + openrouter). Secrets are exposed here,
+  # so this job runs ONLY on same-repo pull requests — fork PRs never reach it.
+  cloud:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/cache@v4
+        with:
+          path: .promptfoo-cache
+          key: ${{ runner.os }}-promptfoo-${{ hashFiles('evals/**', 'datasets/**', 'providers/**', 'prompts/**', 'variants/**', '.gitmodules') }}
+          restore-keys: ${{ runner.os }}-promptfoo-
+      - uses: promptfoo/promptfoo-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config: evals/hermes/promptfooconfig.yaml
+          cache-path: .promptfoo-cache
+          use-config-prompts: true
+          force-run: true
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+  # Local fabric evaluation on the self-hosted homelab runner. The fabric base
+  # URL and model come only from the runner environment — never from the repo.
+  # Gated to same-repo trigger events (push / dispatch / a labeled same-repo PR).
+  fabric:
+    if: >-
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.action == 'labeled' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: [self-hosted, Linux]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: promptfoo/promptfoo-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config: evals/hermes/promptfooconfig.yaml
+          cache-path: .promptfoo-cache
+          use-config-prompts: true
+          force-run: true
+          disable-comment: true
+        env:
+          # PROVIDER_SET selects providers/local.yaml. LOCAL_FABRIC_BASE_URL and
+          # LOCAL_FABRIC_MODEL are inherited from the runner's own environment.
+          PROVIDER_SET: local
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
