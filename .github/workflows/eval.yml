@@ -33,7 +33,10 @@ jobs:
           cache-path: .promptfoo-cache
           use-config-prompts: true
           force-run: true
-          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # GH_ACTION_AI_API_KEY is the org's real Anthropic API key (x-api-key),
+          # not the Claude Code OAuth token — OAuth tokens are prohibited in
+          # unattended CI and would not authenticate the Messages API anyway.
+          anthropic-api-key: ${{ secrets.GH_ACTION_AI_API_KEY }}
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
