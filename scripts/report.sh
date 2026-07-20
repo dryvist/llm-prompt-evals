@@ -2,14 +2,10 @@
 # Standard eval + publish flow for llm-prompt-evals.
 #
 # Runs the output eval, the prompt-quality meta-eval, and the cost/subscription
-# report; assembles a GitHub-viewable results/ report; and (if a promptfoo token
-# is present) publishes the interactive report to promptfoo Cloud.
+# report, then assembles a GitHub-viewable results/ report.
 #
 # Run inside the dev shell, with model keys in the environment (e.g. via doppler):
 #   doppler run -p ai-ci-automation -c prd -- ./scripts/report.sh [config] [-- extra promptfoo args]
-#
-# promptfoo Cloud publishing uses PROMPTFOO_API_KEY (falls back to the dryvist
-# org secret name PROMPTFOO_API_TOKEN). If neither is set, that step is skipped.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p output results
@@ -35,23 +31,15 @@ node scripts/grade_prompts.mjs \
 node scripts/cost_report.mjs --runs output/latest.json \
   --pricing pricing.yaml --out output/cost.json || echo "cost report skipped"
 
-# 5. Publish interactive report to promptfoo Cloud
-export PROMPTFOO_API_KEY="${PROMPTFOO_API_KEY:-${PROMPTFOO_API_TOKEN:-}}"
-SHARE_URL=""
-if [ -n "$PROMPTFOO_API_KEY" ]; then
-  SHARE_URL=$(promptfoo share --yes 2>/dev/null | grep -oE 'https?://[^ ]+' | tail -1 || true)
-  [ -n "$SHARE_URL" ] && echo "promptfoo Cloud: $SHARE_URL"
-else
-  echo "PROMPTFOO_API_KEY / PROMPTFOO_API_TOKEN not set — skipping promptfoo Cloud share."
-fi
-
-# 6. Assemble GitHub-viewable results/
+# 5. Assemble GitHub-viewable results/
+# No promptfoo Cloud share: `promptfoo share` needs a Cloud account, and
+# "Team sharing & collaboration" is Enterprise-only (custom pricing). We stay on
+# the free Community tier, so results/ + the local HTML report ARE the artifact.
 cp -f output/latest.html results/report.html
 node scripts/build_results.mjs \
   --main output/latest.json \
   --quality output/prompt_quality.json \
   --cost output/cost.json \
-  ${SHARE_URL:+--share "$SHARE_URL"} \
   --out results/README.md
 
 echo

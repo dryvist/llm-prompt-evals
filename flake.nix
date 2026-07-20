@@ -27,17 +27,33 @@
 
       perSystem =
         { config, pkgs, ... }:
+        let
+          # Single source of truth for the eval runner version. Keep in sync with
+          # `promptfoo-version:` in .github/workflows/eval.yml.
+          #
+          # nixpkgs' own `promptfoo` has been frozen at 0.118.14 since 2025-10 on
+          # both the stable and unstable channels, so we run it through bun
+          # instead: `bun` is the nix-provided binary, `bunx` fetches the exact
+          # pinned promptfoo at first use. No custom derivation, no global npm.
+          promptfooVersion = "0.121.19";
+          promptfooShim = pkgs.writeShellScriptBin "promptfoo" ''
+            exec ${pkgs.lib.getExe pkgs.bun} x promptfoo@${promptfooVersion} "$@"
+          '';
+        in
         {
           devShells.default = pkgs.mkShell {
-            packages = with pkgs; [
-              promptfoo # the eval runner, straight from nixpkgs — no npm
+            packages = [
+              promptfooShim # `promptfoo …` -> `bunx promptfoo@<pinned> …`
+            ]
+            ++ (with pkgs; [
+              bun # provides bunx; fetches the pinned promptfoo on first use
               nodejs_22 # scripts/summarize.js
               python3 # prompts/load_okf.py
               pre-commit
               gitleaks
               git
               jq
-            ];
+            ]);
 
             shellHook = ''
               ${config.pre-commit.installationScript}
