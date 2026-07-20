@@ -35,8 +35,8 @@ jobs:
           # proxy key). See providers/openrouter.yaml.
           config: evals/hermes/promptfooconfig.yaml
           cache-path: .promptfoo-cache
-          # Pin to the version the dev shell provides (nixpkgs), so local and CI match.
-          promptfoo-version: 0.118.14
+          # Keep in sync with `promptfooVersion` in flake.nix, so local and CI match.
+          promptfoo-version: 0.121.19
           use-config-prompts: true
           force-run: true
           # A gate, not a wall: model-specific quirks (an arithmetic slip, JSON in
@@ -70,7 +70,7 @@ jobs:
           # The fabric config points at providers/local.yaml (the local fabric).
           config: evals/hermes/promptfooconfig.fabric.yaml
           cache-path: .promptfoo-cache
-          promptfoo-version: 0.118.14
+          promptfoo-version: 0.121.19
           use-config-prompts: true
           force-run: true
           disable-comment: true
