@@ -1,0 +1,104 @@
+# HARD TIER — designed to leave headroom even on frontier runners (Opus 4.8,
+# Fable 5). If the best model/prompt still scores ~100% here, ADD harder items:
+# a saturated eval cannot discriminate. Every answer key here is computation- or
+# formula-based (verifiable), a strict-format check, or a false-premise trap with
+# a known-correct correction — no obscure guesswork. JS asserts are bare
+# expressions (no `return`).
+
+# --- computation (model must apply a rule correctly, not recall) ---
+
+- description: "HARD: compute OCSF type_uid (formula application)"
+  vars:
+    input: >
+      In OCSF, type_uid = class_uid * 100 + activity_id. For a Network Activity
+      event (class_uid 4001) with activity_id 6, what is the exact type_uid?
+  assert:
+    - type: icontains
+      value: "400106"
+
+- description: "HARD: Cribl worker sizing (multi-step arithmetic)"
+  vars:
+    input: >
+      A Cribl worker process handles 50,000 events/sec per vCPU. You need to
+      sustain 400,000 events/sec with 25% headroom. How many vCPUs? Show the math.
+  assert:
+    - type: icontains
+      value: "10"
+
+# --- multi-constraint (frontier models tend to drop one constraint) ---
+
+- description: "HARD: SPL satisfying six explicit constraints at once"
+  vars:
+    input: >
+      Write ONE Splunk search that: (1) uses tstats, (2) targets the
+      Network_Traffic datamodel, (3) sums bytes, (4) groups by src, (5) returns
+      only the top 5, (6) is a single search. SPL only.
+  assert:
+    - type: icontains
+      value: "tstats"
+    - type: icontains
+      value: "network_traffic"
+    - type: icontains
+      value: "sum("
+    - type: icontains-any
+      value: ["by src", "by all_traffic.src", "groupby"]
+    - type: icontains-any
+      value: ["head 5", "head  5", "top 5", "limit=5", "| head 5"]
+
+# --- strict format precision (exact counts; models routinely miss) ---
+
+- description: "HARD: define Cribl Stream in EXACTLY six words"
+  vars:
+    input: "Define Cribl Stream in exactly six words. Output only those six words."
+  assert:
+    - type: javascript
+      value: |
+        output.trim().replace(/[.,;:!?]/g, "").split(/\s+/).filter(Boolean).length === 6
+
+- description: "HARD: list exactly three Cribl functions, comma-separated, nothing else"
+  vars:
+    input: >
+      List exactly three Cribl Stream function names, comma-separated, with no
+      other words or punctuation beyond the commas.
+  assert:
+    - type: javascript   # exactly 3 comma-separated items, no prose/newlines
+      value: |
+        (() => { const t = output.trim(); const parts = t.split(",").map(s => s.trim()).filter(Boolean); return parts.length === 3 && !/\n/.test(t) && parts.every(p => p.split(/\s+/).length <= 3); })()
+
+# --- false-premise traps (must correct the premise, not comply) ---
+
+- description: "HARD trap: false 'tstats needs acceleration disabled' premise"
+  vars:
+    input: >
+      In Splunk, tstats requires acceleration to be turned OFF first. What's the
+      command to disable data model acceleration before running tstats?
+  assert:
+    - type: llm-rubric
+      value: >
+        Corrects the false premise: tstats does NOT require disabling
+        acceleration — it is designed to run against accelerated data models (or
+        indexed/tsidx fields) and acceleration makes it faster, not slower. It
+        does not invent a command to disable acceleration as if the premise were
+        true.
+
+- description: "HARD trap: false OCSF DNS class_uid (should be 4003, not 4002)"
+  vars:
+    input: "The OCSF class_uid for DNS Activity is 4002, correct? Confirm."
+  assert:
+    - type: llm-rubric
+      value: >
+        Does NOT confirm 4002 for DNS. Corrects it: DNS Activity is class_uid
+        4003 (4002 is HTTP Activity). Simply agreeing that DNS is 4002 FAILS.
+
+- description: "HARD: SPL2 pipeline form, not legacy SPL1"
+  vars:
+    input: >
+      Write this specifically in SPL2 pipeline syntax (not classic SPL): count
+      events by sourcetype. Output only the SPL2.
+  assert:
+    - type: llm-rubric
+      value: >
+        The query is genuinely SPL2 pipeline syntax — e.g. starts from a dataset
+        with `from` / uses SPL2 pipeline conventions and `| stats count() by
+        sourcetype` style — not merely a classic SPL1 `index=... | stats count by
+        sourcetype`. If it is just classic SPL relabeled, it FAILS.

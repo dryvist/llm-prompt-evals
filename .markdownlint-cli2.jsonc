@@ -1,0 +1,11 @@
+{
+  // Prompt files under variants/ are LLM payloads (OKF prompt fragments consumed
+  // by prompts/load_okf.py as raw text) — intentional XML tags and long
+  // instruction lines are content, not prose to lint. results/ is auto-generated
+  // report output (like CHANGELOG.md, already excluded). Both are data, not docs.
+  "ignores": [
+    "variants/**",
+    "results/**",
+    "catalog/**"
+  ]
+}
