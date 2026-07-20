@@ -44,10 +44,10 @@ jobs:
           fail-on-threshold: 85
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          # With a promptfoo token present, the action publishes the interactive
-          # report to promptfoo Cloud and links it in the PR comment. Org secret
-          # (dryvist), available to all repos. Optional: absence just skips share.
-          PROMPTFOO_API_KEY: ${{ secrets.PROMPTFOO_API_TOKEN }}
+          # No PROMPTFOO_API_KEY on purpose. The action passes --share whenever
+          # one is set, and `promptfoo share` requires a Cloud account — a paid,
+          # custom-priced tier. On the free Community tier the share always
+          # fails, so the PR comment below plus results/ are the report.
 
   # Local fabric evaluation on the self-hosted homelab runner. The fabric base
   # URL and model come only from the runner environment — never from the repo.
