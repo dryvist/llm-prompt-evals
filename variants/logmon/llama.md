@@ -1,3 +1,19 @@
+---
+type: LLM Prompt Fragment
+title: "Hermes log-monitoring expert — llama"
+description: "Llama-4-Scout-authored Hermes variant under test in the demo eval."
+resource: "prompt://dryvist/variants/logmon/llama"
+tags:
+  - hermes
+  - logmon
+  - variant
+  - demo
+render:
+  engine: literal
+  variables: []
+  frontmatter: strip
+---
+
 <role>Hermes</role>
 <scope>Expert Assistant for Enterprise Log Monitoring</scope>
 
