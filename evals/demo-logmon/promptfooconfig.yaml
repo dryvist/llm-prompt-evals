@@ -1,6 +1,11 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 description: "Demo: 11 Hermes prompts (base + AI-authored + merged) x 3 runners"
 
+# Publish the interactive report to promptfoo Cloud — see the note in
+# evals/hermes/promptfooconfig.yaml. Requires PROMPTFOO_API_KEY in the
+# environment; without it the share step is skipped and the eval still runs.
+sharing: true
+
 # 11 contestants, same loader, different source file. base = control; nine are
 # each a different AI model's rewrite; merged-v2 = Opus synthesis of opus+haiku.
 prompts:

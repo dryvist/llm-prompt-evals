@@ -1,6 +1,14 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 description: "Hermes system prompt — canonical vs candidate-a"
 
+# Publish the interactive report to promptfoo Cloud. Sharing is governed by this
+# config key: the CI action's `no-share` input defaults to false, so it defers
+# here rather than enabling sharing on its own. Publishing also needs a token in
+# the environment (PROMPTFOO_API_KEY); without one the share step is skipped and
+# the eval still runs. Uploads prompts and model outputs to the promptfoo account
+# that owns the token.
+sharing: true
+
 # Two prompts, same loader, different OKF source. load_okf strips frontmatter and
 # returns the system prompt; the test's `input` var becomes the user turn.
 prompts:
