@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Demo: 11 Hermes prompts (base + AI-authored + merged) x 3 runners"
+
+# 11 contestants, same loader, different source file. base = control; nine are
+# each a different AI model's rewrite; merged-v2 = Opus synthesis of opus+haiku.
+prompts:
+  - id: &loader file://../../prompts/load_okf.py:load_prompt
+    label: base
+    config: { okf: variants/logmon/base.md }
+  - id: *loader
+    label: opus-4.8
+    config: { okf: variants/logmon/opus.md }
+  - id: *loader
+    label: haiku-4.5
+    config: { okf: variants/logmon/haiku.md }
+  - id: *loader
+    label: codex-gpt-5.3
+    config: { okf: variants/logmon/codex.md }
+  - id: *loader
+    label: gemini-3.1-pro
+    config: { okf: variants/logmon/gemini-pro.md }
+  - id: *loader
+    label: deepseek-v4-flash
+    config: { okf: variants/logmon/deepseek.md }
+  - id: *loader
+    label: qwen3-32b
+    config: { okf: variants/logmon/qwen.md }
+  - id: *loader
+    label: gpt-oss-120b
+    config: { okf: variants/logmon/gpt-oss.md }
+  - id: *loader
+    label: llama-4-scout
+    config: { okf: variants/logmon/llama.md }
+  - id: *loader
+    label: inkling
+    config: { okf: variants/logmon/inkling.md }
+  - id: *loader
+    label: merged-v2
+    config: { okf: variants/logmon/merged-v2.md }
+  - id: *loader
+    label: fable-5
+    config: { okf: variants/logmon/fable.md }
+
+# Three runners. Opus 4.8 is the real intended consumer (primary); the two cheap
+# current-gen flash models test whether a winning prompt GENERALIZES across
+# runners. Holding these constant per column isolates the prompt.
+providers:
+  - id: openrouter:anthropic/claude-opus-4.8
+    label: opus-4.8-SUT
+    config: { temperature: 0, max_tokens: 1200 }
+  - id: openrouter:google/gemini-3-flash-preview
+    label: gemini-3-flash-SUT
+    config: { temperature: 0, max_tokens: 1200 }
+  - id: openrouter:deepseek/deepseek-v4-flash
+    label: deepseek-flash-SUT
+    config: { temperature: 0, max_tokens: 1200 }
+
+defaultTest:
+  options:
+    # Default grader; overridden per-run with --grader for the dual-judge pass.
+    provider:
+      id: openrouter:anthropic/claude-haiku-4.5
+      config:
+        temperature: 0
+
+tests:
+  - file://tests-hard.yaml
