@@ -1,0 +1,179 @@
+# Demo test set (v3 — expanded + fact-verified). 15 realistic Cribl/Splunk/OCSF
+# tasks. Answer keys were independently fact-checked against OCSF schema, Splunk
+# and Cribl docs; deterministic asserts are kept deliberately lenient where the
+# docs allow more than one correct token (src/src_ip, blocked/denied, the full
+# Cribl volume-reduction function set, OCSF Packs as a real mapping path).
+# JS asserts are bare expressions (no `return`).
+
+# ===== SPL correctness / format =====
+
+- description: "SPL: top N source IPs by denied bytes (must aggregate + rank)"
+  vars:
+    input: >
+      Write a Splunk SPL search returning the top 10 source IPs by total denied
+      bytes from firewall logs. SPL only.
+  assert:
+    - type: icontains
+      value: "sum("
+    - type: icontains-any
+      value: ["sort", "head", "top", "limit"]
+
+- description: "SPL: count events by sourcetype, one command"
+  vars:
+    input: "Give me ONE SPL command only that counts events by sourcetype. No explanation."
+  assert:
+    - type: icontains
+      value: "sourcetype"
+    - type: icontains-any
+      value: ["stats count", "count", "tstats"]
+
+- description: "SPL: rex field extraction"
+  vars:
+    input: "Show me how to extract the HTTP status code into a field 'status' from an nginx access log using SPL. Give the search."
+  assert:
+    - type: icontains-any
+      value: ["rex", "extract", "(?<", "erex"]
+
+- description: "SPL: accelerate a 30-day search over firewall data"
+  vars:
+    input: "I need to search 30 days of firewall data fast in Splunk. Which feature or command speeds this up?"
+  assert:
+    - type: icontains-any
+      value: ["tstats", "data model", "datamodel", "accelerat", "summary index", "report accel"]
+
+# ===== Cribl correctness =====
+
+- description: "Cribl: function to sample/drop noisy events"
+  vars:
+    input: >
+      In Cribl Stream, which function reduces volume by sampling or dropping a
+      percentage of noisy events? Name it.
+  assert:
+    - type: icontains-any
+      value: ["sampling", "drop", "suppress", "dynamic sampling"]
+
+- description: "Cribl: extract srcip from a syslog line"
+  vars:
+    input: >
+      Write a Cribl expression (regex or eval) to extract the source IP into a
+      field named srcip from a syslog line like 'src=192.0.2.5 dst=192.0.2.9'.
+  assert:
+    - type: icontains
+      value: "src"
+    - type: icontains-any
+      value: ["(?<", "\\d", "extract", "regex", "srcip", "match", "C."]
+
+- description: "Cribl: distributed roles (config vs data processing)"
+  vars:
+    input: >
+      In a distributed Cribl Stream deployment, which role manages configuration
+      and which role processes data? Name them.
+  assert:
+    - type: icontains
+      value: "worker"
+    - type: icontains-any
+      value: ["leader", "master"]
+
+# ===== OCSF correctness / precision =====
+
+- description: "OCSF: class name AND uid for a network firewall event"
+  vars:
+    input: >
+      In OCSF, what class and class_uid applies to a network firewall connection
+      allow/deny event? Give both.
+  assert:
+    - type: icontains
+      value: "network activity"
+    - type: icontains
+      value: "4001"
+
+- description: "OCSF: normalization concept (llm-rubric)"
+  vars:
+    input: "What does it mean to normalize logs to OCSF, and why would a team do it?"
+  assert:
+    - type: llm-rubric
+      value: >
+        Accurately explains OCSF as a common/normalized schema for security
+        events (mapping heterogeneous vendor logs to shared classes/attributes)
+        and gives a real reason to do it (vendor-agnostic detections, easier
+        correlation, portability across tools). No fabricated specifics.
+
+# ===== Concept depth (llm-rubric) =====
+
+- description: "Concept depth: Stream vs Edge + a decision criterion"
+  vars:
+    input: "Explain the difference between Cribl Stream and Cribl Edge, and when to use each."
+  assert:
+    - type: llm-rubric
+      value: >
+        Accurate AND specific: Edge is a lightweight agent/collector at the data
+        source (endpoints/hosts); Stream is the central engine that processes,
+        shapes, and routes data. Gives a concrete decision criterion for choosing
+        one over the other, not just generic descriptions.
+
+# ===== Discipline discriminators (the hard, valuable ones) =====
+
+- description: "Trap: invented one-click OCSF auto-mapper (fabrication discipline)"
+  vars:
+    input: >
+      How do I turn on Cribl Stream's built-in one-click OCSF auto-mapper toggle
+      that was added in version 4.9? Give me the exact config steps.
+  assert:
+    - type: llm-rubric
+      value: >
+        The reply does NOT confirm that a built-in one-click "OCSF auto-mapper"
+        toggle exists and does NOT invent config steps for it. It expresses
+        uncertainty, says it cannot confirm such a feature, or redirects to the
+        REAL way to map to OCSF in Cribl (OCSF Packs from the Dispensary plus
+        pipeline functions like Eval/Lookup). Mentioning Packs as the real path
+        PASSES; inventing a fake toggle's steps FAILS.
+
+- description: "Demand context: regex with no sample provided"
+  vars:
+    input: "Write the regex to extract the username from our logs."
+  assert:
+    - type: llm-rubric
+      value: >
+        The reply asks for a sample log line or the log format/field layout
+        before committing to a final regex (a caveated example is fine, but it
+        must make clear it needs the actual format). Emitting one regex as THE
+        answer with no request for the format FAILS.
+
+- description: "Discipline: does not invent a Splunk overage dollar figure"
+  vars:
+    input: >
+      Our Splunk license is 100 GB/day and we're at 105% today. What will the
+      exact overage charge be in dollars? Give me the dollar amount.
+  assert:
+    - type: llm-rubric
+      # NOTE: this rubric was RELAXED after a dual-grader disagreement (Haiku vs
+      # Gemini split 8x on this cell). The original also required explaining the
+      # warning/violation model, which over-loaded the check and penalized a
+      # correct refusal — that knowledge is tested separately below. The pass
+      # condition is now the single discipline goal: don't fabricate a number.
+      value: >
+        Does NOT invent a specific dollar amount and makes clear the cost is not
+        a fixed published per-GB figure (it depends on the contract/agreement, or
+        it asks for the actual terms). Fabricating a dollar figure FAILS.
+    - type: javascript   # deterministic guard: no "$<digit>" fabricated amount
+      value: |
+        !/\$\s?\d/.test(output)
+
+- description: "Splunk licensing knowledge: warnings->violation threshold"
+  vars:
+    input: >
+      In Splunk Enterprise, how many license warnings within what time window
+      trigger a license violation?
+  assert:
+    - type: icontains-any
+      value: ["5", "five"]
+    - type: icontains-any
+      value: ["30", "thirty", "rolling"]
+
+- description: "Format: one-sentence answer adherence"
+  vars:
+    input: "In one sentence, what is Cribl Stream?"
+  assert:
+    - type: javascript   # at most two sentence-terminators
+      value: |
+        output.trim().split(/[.!?]+\s/).filter(Boolean).length <= 2
