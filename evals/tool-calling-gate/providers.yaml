@@ -1,0 +1,85 @@
+# Systems under test for the tool-calling gate: the two models that are RESIDENT
+# in the jevans-ms llama-swap `mlx-models` group (persistent, swap:false) — the
+# 80B brain that serves Hermes 24/7 and the co-resident Coder-30B. Benchmarking
+# these adds only request load; it never triggers a model swap, so Hermes is
+# undisturbed. The swap-class models (Thinking-80B, 35B, 35B-OptiQ, gpt-oss-120b)
+# are deliberately absent — loading any of them would add memory/GPU pressure
+# against the resident brain. See run.sh and results/tool-calling-gate.md.
+#
+# Base URL and bearer come from the environment at load time (run.sh derives them
+# from Doppler); nothing is committed. promptfoo renders {{ env.VAR }} via nunjucks.
+#
+# Both providers carry the SAME kanban tool registry (OpenAI function shape),
+# defined once as the &kanban_tools anchor on the brain and reused on the coder.
+# A call to a tool not in this registry, or one missing a required arg, is a
+# fabrication the negative bank must FAIL.
+
+- id: "openai:chat:mlx-community/Qwen3-Next-80B-A3B-Instruct-4bit"
+  label: brain-80b-instruct
+  config:
+    apiBaseUrl: "{{ env.LLM_ROUTER_BASE_URL }}"
+    apiKey: "{{ env.LLM_ROUTER_KEY }}"
+    temperature: 0
+    tools: &kanban_tools
+      - type: function
+        function:
+          name: get_card
+          description: Fetch a kanban card's details by its id.
+          parameters:
+            type: object
+            properties:
+              card_id:
+                type: string
+                description: "The card id, e.g. '88'"
+            required: [card_id]
+            additionalProperties: false
+      - type: function
+        function:
+          name: update_card_status
+          description: Move a kanban card to a new status column.
+          parameters:
+            type: object
+            properties:
+              card_id:
+                type: string
+              status:
+                type: string
+                description: "Target column, e.g. 'in-progress', 'closed'"
+            required: [card_id, status]
+            additionalProperties: false
+      - type: function
+        function:
+          name: search_docs
+          description: Full-text search over the internal homelab runbooks/docs.
+          parameters:
+            type: object
+            properties:
+              query:
+                type: string
+            required: [query]
+            additionalProperties: false
+      - type: function
+        function:
+          name: open_maintenance_window
+          description: Open a maintenance window marking a host hands-off until it ends.
+          parameters:
+            type: object
+            properties:
+              host:
+                type: string
+                description: "Affected host FQDN"
+              ends_at:
+                type: string
+                description: "ISO-8601 timestamp when the window ends"
+              reason:
+                type: string
+            required: [host, ends_at, reason]
+            additionalProperties: false
+
+- id: "openai:chat:mlx-community/Qwen3-Coder-30B-A3B-Instruct-4bit"
+  label: coder-30b
+  config:
+    apiBaseUrl: "{{ env.LLM_ROUTER_BASE_URL }}"
+    apiKey: "{{ env.LLM_ROUTER_KEY }}"
+    temperature: 0
+    tools: *kanban_tools

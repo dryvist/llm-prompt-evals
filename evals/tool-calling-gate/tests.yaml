@@ -1,0 +1,115 @@
+# Hermes tool-calling gate — 10 cases shaped like kanban-card agent work.
+# Tool registry (get_card, update_card_status, search_docs,
+# open_maintenance_window) lives on the providers (providers.yaml).
+#
+# Metrics (aggregated per model by rank.mjs):
+#   valid_call        — emitted a syntactically valid tool call (positive bank)
+#   correct_selection — called the RIGHT tool with all required args present
+#   refusal           — correctly declined to fabricate a call (negative bank)
+#   incorporation     — used a prior tool result instead of re-calling
+#   output_contract   — obeyed an exact output-format instruction
+
+# ---------- positive bank: valid emission + correct selection (5) ----------
+
+- description: "pos-01 get_card — fetch a card"
+  vars:
+    input: "Pull up the details for kanban card 88."
+    expect_tool: get_card
+    expect_required: card_id
+  assert:
+    - { type: javascript, value: "file://assert_valid_call.js", metric: valid_call }
+    - { type: javascript, value: "file://../../datasets/assert_tools.js", metric: correct_selection }
+
+- description: "pos-02 update_card_status — move a card"
+  vars:
+    input: "Move card 88 to in-progress."
+    expect_tool: update_card_status
+    expect_required: "card_id,status"
+  assert:
+    - { type: javascript, value: "file://assert_valid_call.js", metric: valid_call }
+    - { type: javascript, value: "file://../../datasets/assert_tools.js", metric: correct_selection }
+
+- description: "pos-03 search_docs — runbook lookup"
+  vars:
+    input: "Search the runbooks for how to converge a new DNS record."
+    expect_tool: search_docs
+    expect_required: query
+  assert:
+    - { type: javascript, value: "file://assert_valid_call.js", metric: valid_call }
+    - { type: javascript, value: "file://../../datasets/assert_tools.js", metric: correct_selection }
+
+- description: "pos-04 open_maintenance_window — three required args"
+  vars:
+    input: "Open a maintenance window for dns1.home.example ending 2026-07-22T02:00:00Z because we're upgrading the .NET runtime."
+    expect_tool: open_maintenance_window
+    expect_required: "host,ends_at,reason"
+  assert:
+    - { type: javascript, value: "file://assert_valid_call.js", metric: valid_call }
+    - { type: javascript, value: "file://../../datasets/assert_tools.js", metric: correct_selection }
+
+- description: "pos-05 selection discrimination — 'close it' is a status move, not a fetch"
+  vars:
+    input: "Card 91 passed review — close it out."
+    expect_tool: update_card_status
+    expect_required: "card_id,status"
+  assert:
+    - { type: javascript, value: "file://assert_valid_call.js", metric: valid_call }
+    - { type: javascript, value: "file://../../datasets/assert_tools.js", metric: correct_selection }
+
+# ---------- negative bank: refuse to hallucinate a tool (2) ----------
+
+- description: "neg-01 no tool fits — must answer in text, not fabricate a call"
+  vars:
+    input: "Write a two-line summary of what the last sprint accomplished."
+    expect_no_call: true
+  assert:
+    - { type: javascript, value: "file://../../datasets/assert_tools.js", metric: refusal }
+
+- description: "neg-02 missing required args — must ask, not guess a window"
+  vars:
+    input: "Open a maintenance window."
+    expect_no_call: true
+  assert:
+    - { type: javascript, value: "file://../../datasets/assert_tools.js", metric: refusal }
+
+# ---------- multi-turn: incorporate a prior tool result (1) ----------
+
+- description: "multi-01 incorporate get_card result, do not re-call"
+  vars:
+    history:
+      - role: system
+        content: "You manage a homelab kanban board through tools. Use a tool only when one fits; never invent one. Once a tool has returned data, answer from it — do not repeat the call."
+      - role: user
+        content: "What's blocking card 88?"
+      - role: assistant
+        content: null
+        tool_calls:
+          - id: call_88
+            type: function
+            function: { name: get_card, arguments: '{"card_id":"88"}' }
+      - role: tool
+        tool_call_id: call_88
+        content: '{"card_id":"88","status":"blocked","blocker":"LIN-42","title":"DNS cutover"}'
+      - role: user
+        content: "So which issue number is the blocker?"
+    expect_no_call: true
+  assert:
+    - { type: contains, value: "LIN-42", metric: incorporation }
+    - { type: javascript, value: "file://../../datasets/assert_tools.js", metric: incorporation }
+
+# ---------- output-contract adherence (2) ----------
+
+- description: "output-01 single lowercase word, data already in context"
+  vars:
+    input: "Card 88's status is 'open'. Do not call any tool. Reply with ONLY the status as a single lowercase word, no punctuation."
+  assert:
+    - type: javascript
+      value: "output.trim().toLowerCase().replace(/[^a-z]/g,'') === 'open'"
+      metric: output_contract
+
+- description: "output-02 exact JSON, nothing else"
+  vars:
+    input: 'Card 88 has id 88 and status open. Do not call any tool. Return exactly this JSON and nothing else: {"card":88,"status":"open"}'
+  assert:
+    - { type: is-json, metric: output_contract }
+    - { type: contains, value: '"status"', metric: output_contract }

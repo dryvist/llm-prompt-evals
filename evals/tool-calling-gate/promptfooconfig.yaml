@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Hermes tool-calling gate — valid-call + correct-selection fidelity"
+
+# One prompt builder for every case. build_messages.py returns a role-tagged
+# message list: a single user turn from vars.input, or a full multi-turn history
+# from vars.history (the tool-result-incorporation case). Mirrors the repo's
+# existing prompts/load_okf.py prompt-function convention.
+prompts:
+  - id: file://build_messages.py:build
+    label: tool-gate
+
+# Systems under test: the two RESIDENT llama-swap models only (brain + Coder-30B).
+# Deterministic asserts throughout — no llm-rubric grader, so no grading key and
+# no per-judge cost.
+providers:
+  - file://providers.yaml
+
+tests:
+  - file://tests.yaml
