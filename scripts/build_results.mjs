@@ -121,7 +121,7 @@ if (cost) {
   md += `\n**Total metered (OpenRouter): $${cost.totalMetered.toFixed(2)}.** Subscription-eligible: $${cost.totalSubEligible.toFixed(2)} → **effective out-of-pocket ≈ $${eff.toFixed(2)}** if routed via Claude/Codex/Agy subscriptions. \\* = extrapolated from live cells (partly cached); \`--no-cache\` for exact.\n\n`;
 }
 
-md += `## Reproduce\n\n\`\`\`bash\nnix develop\ndoppler run -p ai-ci-automation -c prd -- ./scripts/report.sh evals/demo-logmon/promptfooconfig.yaml\n\`\`\`\n`;
+md += `## Reproduce\n\n\`\`\`bash\nnix develop\ndoppler run -p "$AI_DOPPLER_PROJECT" -c "$AI_DOPPLER_CONFIG" -- ./scripts/report.sh evals/demo-logmon/promptfooconfig.yaml\n\`\`\`\n`;
 
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, md);
