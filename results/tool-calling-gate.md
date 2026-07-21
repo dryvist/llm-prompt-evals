@@ -25,6 +25,12 @@ undisturbed. Every `mlx-swap-models` member was **skipped**: loading one adds
 disturb or (for the 120B / Thinking-80B) memory-pressure the brain. Requests were
 serialized (`-j 1`, 400 ms spacing) so Hermes' own traffic interleaves cleanly.
 
+> Note on OptiQ (`Qwen3.6-35B-A3B-OptiQ-4bit`): beyond the safety exclusion, its
+> current nix-ai serve config is missing its defining flags (`--enable-mtp` +
+> `--kv-cache-quantization*`) and the pinned `mtp.safetensors` rev — so it serves
+> crippled and any bench of it would misrepresent the model. Do not benchmark it
+> until serve-config parity lands (nix-ai issue pending).
+
 ## Ranked results
 
 | rank | model | valid_call | correct_selection | refusal | incorporation | output_contract | overall |
