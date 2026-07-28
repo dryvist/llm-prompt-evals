@@ -5,7 +5,7 @@
 # report, then assembles a GitHub-viewable results/ report.
 #
 # Run inside the dev shell, with model keys in the environment (e.g. via doppler):
-#   doppler run -p ai-ci-automation -c prd -- ./scripts/report.sh [config] [-- extra promptfoo args]
+#   doppler run -p "$AI_DOPPLER_PROJECT" -c "$AI_DOPPLER_CONFIG" -- ./scripts/report.sh [config] [-- extra promptfoo args]
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p output results

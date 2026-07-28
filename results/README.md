@@ -120,5 +120,5 @@ Judges: anthropic/claude-haiku-4.5, google/gemini-3-flash-preview. Each prompt s
 
 ```bash
 nix develop
-doppler run -p ai-ci-automation -c prd -- ./scripts/report.sh evals/demo-logmon/promptfooconfig.yaml
+doppler run -p "$AI_DOPPLER_PROJECT" -c "$AI_DOPPLER_CONFIG" -- ./scripts/report.sh evals/demo-logmon/promptfooconfig.yaml
 ```
