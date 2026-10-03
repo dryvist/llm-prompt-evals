@@ -76,6 +76,6 @@ jobs:
           disable-comment: true
           fail-on-threshold: 85
         env:
-          # LOCAL_FABRIC_BASE_URL and LOCAL_FABRIC_MODEL are inherited from the
-          # runner's own environment. OPENROUTER_API_KEY drives the llm-rubric grader.
+          # LOCAL_FABRIC_BASE_URL and LOCAL_FABRIC_MODEL are read from the
+          # environment. OPENROUTER_API_KEY drives the llm-rubric grader.
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}

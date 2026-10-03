@@ -19,7 +19,7 @@ against the canonical version — not a second copy of the source of truth.
 ## Non-negotiables
 
 - **Never commit secrets or fabric endpoints.** Every key and URL comes from the
-  environment (`.env` locally, runner env in CI). `.env` is gitignored.
+  environment.
 - **Fork pull requests never receive cloud secrets.** Cloud-provider jobs run
   only on same-repo pull requests; forks fall back to a runner with no secrets.
 - **Negative tool-call cases must FAIL a fabricated call.** When no registered
@@ -34,13 +34,13 @@ against the canonical version — not a second copy of the source of truth.
 
 | Path | Holds |
 | --- | --- |
-| `catalog/` | Pinned submodule — the canonical prompt catalog (read-only here). |
-| `prompts/` | `load_okf.py`: loads an OKF prompt by path or `prompt://` id, strips frontmatter. |
+| `catalog/` | Pinned submodule: canonical prompt catalog (read-only here). |
+| `prompts/` | `load_okf.py`: loads an OKF prompt, strips frontmatter. |
 | `variants/` | Candidate prompts under test (e.g. `hermes/candidate-a.md`). |
 | `providers/` | promptfoo provider configs (`local.yaml`, `cloud.yaml`). |
 | `evals/` | Eval suites (`hermes/promptfooconfig.yaml` + `tests.yaml`). |
 | `datasets/` | Test cases ported from `mlx-benchmarks` probe banks. |
-| `scripts/` | `report.sh` — renders `output/latest.{json,html}` + a markdown summary. |
+| `scripts/` | `report.sh`: writes `output/latest.{json,html}` and a summary. |
 
 ## Definition of done
 

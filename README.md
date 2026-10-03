@@ -21,8 +21,10 @@ git clone git@github.com:dryvist/llm-prompt-evals.git
 cd llm-prompt-evals
 direnv allow                   # loads the dev shell: promptfoo, python, node
 git submodule update --init    # fetch the prompt catalog
-cp .env.example .env           # paste your OPENROUTER_API_KEY into .env
 ```
+
+The eval reads its provider keys from the environment; `.env.example` lists the
+variable names.
 
 ## Usage
 
