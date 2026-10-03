@@ -1,6 +1,6 @@
 # Local fabric: an OpenAI-compatible endpoint. Base URL and model come from the
 # environment, never committed. promptfoo renders this file with nunjucks, so
-# {{ env.VAR }} reads the runner/.env value at load time.
+# {{ env.VAR }} reads the environment value at load time.
 #
 # ponytail: the model id is templated from LOCAL_FABRIC_MODEL; if a promptfoo
 # version stops interpolating the provider id, set OPENAI_BASE_URL + a fixed id

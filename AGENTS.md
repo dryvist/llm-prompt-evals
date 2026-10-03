@@ -5,8 +5,8 @@ Rules for anyone (human or agent) working in this repo. Distilled from
 
 ## Never
 
-- **Never commit a secret or a fabric endpoint.** Keys and URLs come from the
-  environment. `.env` is gitignored; keep it that way.
+- **Never commit a secret or a fabric endpoint.** Keys and URLs are read from the
+  environment.
 - **Never copy a canonical prompt into this repo.** Canonical prompts live in
   the `catalog/` submodule (`dryvist/ai-llm-prompts`). Files under `variants/`
   are candidates under test, not copies of the source of truth.
@@ -32,7 +32,6 @@ provided by the flake (nixpkgs), alongside `python3` and `node`.
 ```bash
 direnv allow           # dev shell: promptfoo, python, node (no npm)
 git submodule update --init   # fetch the pinned catalog
-cp .env.example .env   # add OPENROUTER_API_KEY
 promptfoo eval -c evals/hermes/promptfooconfig.yaml
 promptfoo view         # the visual pass/fail report in a browser
 ./scripts/report.sh    # or write output/latest.{json,html} + a summary
