@@ -104,11 +104,11 @@
     "dryvist-github": {
       "flake": false,
       "locked": {
-        "lastModified": 1790974363,
-        "narHash": "sha256-S4Hw4fdCV1sa4MnzD8/URA7sdMlZ78TRl5C2Hl3ViDg=",
+        "lastModified": 1791026372,
+        "narHash": "sha256-yYW+TwB8ez3HIDK1jOWoVOjrUpD2oMbFT6pi0QHR01U=",
         "owner": "dryvist",
         "repo": ".github",
-        "rev": "9653723b41a8f1b8a17920ca89167fb849accec5",
+        "rev": "9cb1a5f05818fece155c44d70a3b82a0a8442c93",
         "type": "github"
       },
       "original": {
@@ -318,11 +318,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1790976614,
-        "narHash": "sha256-EJ5sckf+YAfSEWUdKCePoSMhHjelhh+fVjwFyvO6inI=",
+        "lastModified": 1791031195,
+        "narHash": "sha256-PfE0xqDvKC1lgAc96j7M8Db9lXfmi0+lcnbUwcEHaKc=",
         "owner": "dryvist",
         "repo": "nix-devenv",
-        "rev": "d585b41eed91aeed261b99d9da00808a2aade26d",
+        "rev": "76bffd4074fdbed0915a35925a0b3306f71a645c",
         "type": "github"
       },
       "original": {
