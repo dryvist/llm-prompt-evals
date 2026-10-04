@@ -4,7 +4,7 @@
 # Runs the output eval, the prompt-quality meta-eval, and the cost/subscription
 # report, then assembles a GitHub-viewable results/ report.
 #
-# Run inside the dev shell, with model keys in the environment (e.g. from .env):
+# Run inside the dev shell, with model keys in the environment:
 #   ./scripts/report.sh [config] [-- extra promptfoo args]
 set -euo pipefail
 cd "$(dirname "$0")/.."
