@@ -26,6 +26,29 @@ git submodule update --init    # fetch the prompt catalog
 The eval reads its provider keys from the environment; `.env.example` lists the
 variable names.
 
+## Hermes recurring-job quality
+
+`datasets/hermes_jobs.json` contains ten synthetic tasks derived from recurring
+Hermes jobs. Each case records the `hermes-default` task alias and a deterministic
+or rubric-graded expected outcome. The local Promptfoo suite uses `goal-judge`
+through the same router for its two rubric checks:
+
+```bash
+promptfoo eval -c evals/hermes/promptfooconfig.jobs.yaml
+python scripts/hermes_langfuse_eval.py validate
+python scripts/hermes_langfuse_eval.py seed
+python scripts/hermes_langfuse_eval.py run --summary-json output/hermes-agent-eval-dimensions.json
+```
+
+`validate` checks the fixture contract without a network call. `seed` creates
+the versioned native Langfuse dataset and adds missing items idempotently.
+`run` creates a Langfuse experiment and scores each item plus the run. Its
+summary JSON can be passed to
+`mlx-bench-publish --campaign-dimensions` alongside the throughput result so the
+published row retains task quality and serving measurements. Router and
+Langfuse URLs and keys come only from the environment; the judge alias is fixed
+to `goal-judge`.
+
 ## Usage
 
 Evaluate a prompt in four steps.

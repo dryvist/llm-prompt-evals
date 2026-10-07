@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Hermes recurring-job task quality through the local router"
+
+prompts:
+  - id: file://../../prompts/load_okf.py:load_prompt
+    label: hermes-canonical
+    config:
+      okf: catalog/auto-ai-agent/hermes.md
+
+providers:
+  - file://../../providers/hermes-router.yaml
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:goal-judge
+      config:
+        apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL }}"
+        apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
+        temperature: 0
+
+tests:
+  - file://../../datasets/hermes_jobs.json

@@ -1,0 +1,211 @@
+[
+  {
+    "description": "assistant-task-triage keeps recommendations read-only",
+    "vars": {
+      "task_id": "assistant-task-triage",
+      "job_name": "assistant-task-triage",
+      "model_alias": "hermes-default",
+      "grading": "deterministic",
+      "input": "Run the assistant-task-triage review on these synthetic items. Do not change anything. Return exactly one JSON object with arrays named reschedule, close, and confirm. ITEM-10 is overdue; its owner confirmed the new due date 2026-10-09. ITEM-11 is complete according to its acceptance note but remains open. ITEM-12 may be obsolete, but the evidence is uncertain. Expected dispositions: reschedule ITEM-10 to 2026-10-09, close ITEM-11, and ask for confirmation on ITEM-12.",
+      "expected_outcome": "{\"reschedule\":[\"ITEM-10@2026-10-09\"],\"close\":[\"ITEM-11\"],\"confirm\":[\"ITEM-12\"]}",
+      "exact_output": "{\"reschedule\":[\"ITEM-10@2026-10-09\"],\"close\":[\"ITEM-11\"],\"confirm\":[\"ITEM-12\"]}"
+    },
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "JSON.stringify(JSON.parse(output)) === '{\"reschedule\":[\"ITEM-10@2026-10-09\"],\"close\":[\"ITEM-11\"],\"confirm\":[\"ITEM-12\"]}'"
+      }
+    ]
+  },
+  {
+    "description": "blocked-parent-triage reports only a new eligible parent",
+    "vars": {
+      "task_id": "blocked-parent-triage",
+      "job_name": "blocked-parent-triage-digest",
+      "model_alias": "hermes-default",
+      "grading": "deterministic",
+      "input": "Run the blocked-parent digest on this synthetic board. Return exactly a JSON array with id, age_days, and children_starved. P-01 is blocked for 12 days with one ready child but was already reported and its state did not change. P-02 is awaiting input for 10 days with one ready child and has not been reported. P-03 is blocked for 4 days with two ready children. Report only a parent older than 7 days with a ready child whose status changed or which is new.",
+      "expected_outcome": "[{\"id\":\"P-02\",\"age_days\":10,\"children_starved\":1}]",
+      "exact_output": "[{\"id\":\"P-02\",\"age_days\":10,\"children_starved\":1}]"
+    },
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "JSON.stringify(JSON.parse(output)) === '[{\"id\":\"P-02\",\"age_days\":10,\"children_starved\":1}]'"
+      }
+    ]
+  },
+  {
+    "description": "daily-summary contains deltas and omits unchanged status",
+    "vars": {
+      "task_id": "daily-summary",
+      "job_name": "daily-summary",
+      "model_alias": "hermes-default",
+      "grading": "deterministic",
+      "input": "Write the daily operator summary from this synthetic evidence. Yesterday's summary already said all checks were healthy and mentioned the existing follow-up TASK-08. Today a new validation failure appeared in task TASK-42: the output field is missing. TASK-08 is still awaiting its owner. Everything else is unchanged. Report only today's new finding and open action; do not repeat benign status.",
+      "expected_outcome": "Mention the new TASK-42 missing-output validation failure and the still-open TASK-08 action; omit unchanged healthy status.",
+      "expected_contains": [
+        "TASK-42",
+        "missing",
+        "TASK-08"
+      ],
+      "forbidden": [
+        "all checks were healthy",
+        "everything is healthy"
+      ]
+    },
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "['TASK-42','missing','TASK-08'].every(term => output.toLowerCase().includes(term.toLowerCase())) && !/all checks were healthy|everything is healthy/i.test(output)"
+      }
+    ]
+  },
+  {
+    "description": "github-triage blocks readiness on an unresolved thread",
+    "vars": {
+      "task_id": "github-triage",
+      "job_name": "github-triage",
+      "model_alias": "hermes-default",
+      "grading": "deterministic",
+      "input": "Run a read-only pull-request readiness check from these synthetic facts. The pull request is open, non-draft, conflict-free, and every required check passed. One review thread remains unresolved. Return exactly this JSON shape: {\"ready\":boolean,\"blockers\":[string]}. Do not perform any writes.",
+      "expected_outcome": "{\"ready\":false,\"blockers\":[\"unresolved review thread\"]}",
+      "exact_output": "{\"ready\":false,\"blockers\":[\"unresolved review thread\"]}"
+    },
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "JSON.stringify(JSON.parse(output)) === '{\"ready\":false,\"blockers\":[\"unresolved review thread\"]}'"
+      }
+    ]
+  },
+  {
+    "description": "docs-study reports a synthetic documentation contradiction",
+    "vars": {
+      "task_id": "docs-study",
+      "job_name": "docs-study",
+      "model_alias": "hermes-default",
+      "grading": "deterministic",
+      "input": "Review this synthetic documentation area. GUIDE.md says the supported version is 1.3; README.md says 1.2; the package manifest says 1.3. Report only the evidenced mismatch, cite the two documents and values, and do not edit anything. Return exactly this JSON: {\"findings\":[{\"claim\":\"supported version\",\"sources\":[\"GUIDE.md\",\"README.md\"],\"values\":[\"1.3\",\"1.2\"]}],\"writes\":false}.",
+      "expected_outcome": "{\"findings\":[{\"claim\":\"supported version\",\"sources\":[\"GUIDE.md\",\"README.md\"],\"values\":[\"1.3\",\"1.2\"]}],\"writes\":false}",
+      "expected_contains": [
+        "database timeout",
+        "9",
+        "2 hosts",
+        "new"
+      ],
+      "forbidden": [
+        "all clear",
+        "worker retry limit reached is new"
+      ],
+      "exact_output": "{\"findings\":[{\"claim\":\"supported version\",\"sources\":[\"GUIDE.md\",\"README.md\"],\"values\":[\"1.3\",\"1.2\"]}],\"writes\":false}"
+    },
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "JSON.stringify(JSON.parse(output)) === '{\"findings\":[{\"claim\":\"supported version\",\"sources\":[\"GUIDE.md\",\"README.md\"],\"values\":[\"1.3\",\"1.2\"]}],\"writes\":false}'"
+      }
+    ]
+  },
+  {
+    "description": "service-pulse reports probe results and incident counts",
+    "vars": {
+      "task_id": "service-pulse",
+      "job_name": "service-pulse",
+      "model_alias": "hermes-default",
+      "grading": "deterministic",
+      "input": "Summarize this synthetic service pulse. Router returned HTTP 200, tracing returned HTTP 503, and one memory probe returned 000. Open incident count is 6; high-priority count is 1. Distinguish an HTTP response from a healthy service: report router healthy, tracing answered but unhealthy, and the single 000 probe as unconfirmed; include both incident counts. Never claim the 000 confirms an outage.",
+      "expected_outcome": "Router healthy (200); tracing answered but unhealthy (503); memory probe 000 is unconfirmed; 6 open incidents and 1 high-priority incident.",
+      "expected_contains": [
+        "200",
+        "503",
+        "000",
+        "unconfirmed",
+        "6",
+        "1 high"
+      ],
+      "forbidden": [
+        "memory service is down",
+        "confirmed outage"
+      ]
+    },
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "['200','503','000','unconfirmed','6','1 high'].every(term => output.toLowerCase().includes(term)) && !/memory service is down|confirmed outage/i.test(output)"
+      }
+    ]
+  },
+  {
+    "description": "self-audit stays silent when its delta is empty",
+    "vars": {
+      "task_id": "self-audit",
+      "job_name": "self-audit",
+      "model_alias": "hermes-default",
+      "grading": "deterministic",
+      "input": "Run the synthetic self-audit delta check. The last fingerprint matches current state, no new finding is present, and no previous finding changed. If there is no delta, reply exactly [SILENT].",
+      "expected_outcome": "[SILENT]",
+      "exact_output": "[SILENT]"
+    },
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "output.trim() === '[SILENT]'"
+      }
+    ]
+  },
+  {
+    "description": "assistant-decision-nudge stays silent when no decision is pending",
+    "vars": {
+      "task_id": "assistant-decision-nudge",
+      "job_name": "assistant-decision-nudge",
+      "model_alias": "hermes-default",
+      "grading": "deterministic",
+      "input": "Run the decision-nudge check. The synthetic task list has no unanswered question, approval, owner decision, or blocker waiting on the operator. Unfinished tasks all have active owners. If nothing is blocked on an operator decision, reply exactly [SILENT].",
+      "expected_outcome": "[SILENT]",
+      "exact_output": "[SILENT]"
+    },
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "output.trim() === '[SILENT]'"
+      }
+    ]
+  },
+  {
+    "description": "fleet-health identifies a measured regression against baseline",
+    "vars": {
+      "task_id": "fleet-health",
+      "job_name": "fleet-health",
+      "model_alias": "hermes-default",
+      "grading": "rubric",
+      "input": "Review synthetic weekly fleet-health measurements against the saved baseline. The error-card count increased from 2 to 5; all other monitored counts are unchanged. Report the regression, quantify the change, and state that the new baseline is 5. Do not infer a cause or modify anything.",
+      "expected_outcome": "Identify the error-card count regression from 2 to 5, quantify the increase by 3, update the reported baseline to 5, and avoid inventing a cause or making changes.",
+      "rubric": "Pass only if the response identifies the error-card count as a regression, gives both 2 and 5 (or the increase of 3), reports 5 as the new baseline, and does not invent a cause or claim a write. Fail if it misses the regression, confuses direction, or proposes an unsupported cause."
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Identify the error-card regression from 2 to 5, report the new baseline as 5, and do not invent a cause or claim a change."
+      }
+    ]
+  },
+  {
+    "description": "model-routing-review reports changes while ignoring star-count noise",
+    "vars": {
+      "task_id": "model-routing-review",
+      "job_name": "model-routing-review",
+      "model_alias": "hermes-default",
+      "grading": "rubric",
+      "input": "Run the synthetic weekly model-routing landscape review. Since the saved baseline, awesome-model-routing added repo new/router-a and removed old/router-b; its star counts also changed, which is not a reportable change by itself. claude-code-router published release v2.4.0 dated 2026-10-05. Report the two repository changes and the release, ignore star-count-only changes, and end with the updated baseline: 12 repos | 8400 CCR stars | v2.4.0 2026-10-05.",
+      "expected_outcome": "Report added repo new/router-a, removed repo old/router-b, and release v2.4.0 (2026-10-05); ignore star-only changes; end with the exact updated baseline line.",
+      "rubric": "Pass only if the response reports both repository changes and the new v2.4.0 release with its date, does not report star-count movement as a finding, and ends with the exact supplied baseline. Fail if it invents additional changes or omits any required item."
+    },
+    "assert": [
+      {
+        "type": "llm-rubric",
+        "value": "Report the added and removed repo and v2.4.0 dated 2026-10-05, ignore star-count noise, and end with the exact baseline line."
+      }
+    ]
+  }
+]

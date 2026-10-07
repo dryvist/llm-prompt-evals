@@ -39,6 +39,10 @@
           promptfooShim = pkgs.writeShellScriptBin "promptfoo" ''
             exec ${pkgs.lib.getExe pkgs.bun} x promptfoo@${promptfooVersion} "$@"
           '';
+          evalPython = pkgs.python3.withPackages (pythonPackages: [
+            pythonPackages.langfuse
+            pythonPackages.openai
+          ]);
         in
         {
           devShells.default = pkgs.mkShell {
@@ -48,7 +52,7 @@
             ++ (with pkgs; [
               bun # provides bunx; fetches the pinned promptfoo on first use
               nodejs_22 # scripts/summarize.js
-              python3 # prompts/load_okf.py
+              evalPython # prompt loader + Langfuse experiment SDK + OpenAI-compatible client
               pre-commit
               gitleaks
               git

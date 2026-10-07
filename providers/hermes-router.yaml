@@ -1,0 +1,15 @@
+# Hermes task generation and grading use router aliases. Keep the service URL
+# and consumer key in the environment; the aliases are declared by the router.
+- id: openai:chat:hermes-default
+  label: hermes-default
+  config:
+    apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL }}"
+    apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
+    temperature: 0
+
+- id: openai:chat:goal-judge
+  label: goal-judge
+  config:
+    apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL }}"
+    apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
+    temperature: 0
