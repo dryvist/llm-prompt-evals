@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: "Auto vs medium router parity"
+
+prompts:
+  - "{{prompt}}"
+
+providers:
+  - id: openai:chat:auto
+    label: auto
+    config: &local_fabric
+      apiBaseUrl: "{{ env.LOCAL_FABRIC_BASE_URL }}"
+      apiKey: "{{ env.LOCAL_FABRIC_API_KEY | default('sk-local-noauth') }}"
+      temperature: 0
+  - id: openai:chat:medium
+    label: medium
+    config: *local_fabric
+
+defaultTest:
+  options:
+    provider:
+      id: openrouter:mistralai/mistral-small-24b-instruct-2501
+      config:
+        temperature: 0
+  assert:
+    - type: llm-rubric
+      value: |
+        Judge only against this case's expected behavior: {{expected_behavior}}.
+        Reward correct, complete, grounded answers. Penalize missed required
+        findings, incorrect claims, invented details, and unsafe advice.
+      threshold: 0.8
+
+tests:
+  - file://tests.yaml

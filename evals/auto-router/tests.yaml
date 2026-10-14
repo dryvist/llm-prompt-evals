@@ -1,0 +1,479 @@
+- description: "SIMPLE-01"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "What is 17 times 19?"
+    expected_behavior: "State 323 with a brief calculation."
+
+- description: "SIMPLE-02"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "Sort these words alphabetically: cedar, ash, birch."
+    expected_behavior: "Return ash, birch, cedar in that order."
+
+- description: "SIMPLE-03"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "Convert 20 degrees Celsius to Fahrenheit."
+    expected_behavior: "Return 68 degrees Fahrenheit."
+
+- description: "SIMPLE-04"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "Given {\"items\":[\"pen\",\"book\"],\"count\":2}, return the count only."
+    expected_behavior: "Return the number 2."
+
+- description: "SIMPLE-05"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "Reverse the string router."
+    expected_behavior: "Return retuor."
+
+- description: "SIMPLE-06"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "Translate Good morning into French."
+    expected_behavior: "Return Bonjour."
+
+- description: "SIMPLE-07"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "Write SQL for the five newest jobs by created_at."
+    expected_behavior: "Use ORDER BY created_at DESC and LIMIT 5."
+
+- description: "SIMPLE-08"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "How many bits represent integers from 0 through 15?"
+    expected_behavior: "Answer 4 bits."
+
+- description: "SIMPLE-09"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "Find the median of 3, 9, 4, 7, 20."
+    expected_behavior: "Return 7."
+
+- description: "SIMPLE-10"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "What does HTTP status 404 mean?"
+    expected_behavior: "Explain that the requested resource was not found."
+
+- description: "SIMPLE-11"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "Extract domains from a@one.test and b@two.example."
+    expected_behavior: "Return one.test and two.example."
+
+- description: "SIMPLE-12"
+  metadata:
+    category: SIMPLE
+    source: held-out
+  vars:
+    prompt: "Return only a JSON boolean for whether 12 is even."
+    expected_behavior: "Return valid JSON true and nothing else."
+
+- description: "MEDIUM-01"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "One worker has four hours. A takes two hours; B takes three hours after A; C takes one hour. Which tasks can finish?"
+    expected_behavior: "State A and C fit within four hours; B cannot finish."
+
+- description: "MEDIUM-02"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "A tool saves three hours weekly after eight setup hours. What is the net time saved after four weeks?"
+    expected_behavior: "Calculate 12 saved minus 8 setup, for 4 hours net."
+
+- description: "MEDIUM-03"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "Write a query for pending jobs created on or after a supplied timestamp."
+    expected_behavior: "Filter status to pending and created_at >= the timestamp parameter."
+
+- description: "MEDIUM-04"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "What does range(1, len(items)) omit when iterating indexes?"
+    expected_behavior: "Explain that index zero, the first item, is omitted."
+
+- description: "MEDIUM-05"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "Logs show 429, 429, then 200, but the client times out. What is established?"
+    expected_behavior: "The third upstream request succeeded; the caller deadline or response path still failed."
+
+- description: "MEDIUM-06"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "Four reviewers each handle three PRs daily. Eighteen arrive daily. How does backlog change?"
+    expected_behavior: "Capacity is 12 per day, so backlog grows by 6 daily."
+
+- description: "MEDIUM-07"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "Why is retrying a GET usually safer than retrying a POST?"
+    expected_behavior: "Explain GET is generally idempotent; note server behavior still matters."
+
+- description: "MEDIUM-08"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "Convert Ada from London and Lin from Oslo into a JSON array of name and city objects."
+    expected_behavior: "Return valid JSON with both records and no extra fields."
+
+- description: "MEDIUM-09"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "Why can a low average latency hide a slow user experience?"
+    expected_behavior: "Explain that a slow tail, such as p95, is hidden by the mean."
+
+- description: "MEDIUM-10"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "A function mutates a dictionary then returns it. Why can the caller observe the change?"
+    expected_behavior: "Explain that both references point to the same mutable object."
+
+- description: "MEDIUM-11"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "Data must be at most five seconds stale. A cache uses a ten-second TTL. What should change?"
+    expected_behavior: "Set TTL to five seconds or less, or use reliable invalidation."
+
+- description: "MEDIUM-12"
+  metadata:
+    category: MEDIUM
+    source: held-out
+  vars:
+    prompt: "Three equally sized request groups have 1%, 3%, and 5% errors. Find the overall rate."
+    expected_behavior: "Return 3% because the groups are equally sized."
+
+- description: "COMPLEX-01"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Plan a database field rename while old and new app versions run together."
+    expected_behavior: "Use expand, dual-read/write as needed, backfill, switch readers, then remove the old field with rollback points."
+
+- description: "COMPLEX-02"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Two workers read 10, add one, and write concurrently. Explain the failure and fix."
+    expected_behavior: "Identify a lost update and recommend an atomic increment or transaction."
+
+- description: "COMPLEX-03"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Design a cache key for private records shared by multiple tenants."
+    expected_behavior: "Include tenant and resource identity; prevent cross-tenant reuse and authorize on reads."
+
+- description: "COMPLEX-04"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Roll out a new API field without breaking older clients."
+    expected_behavior: "Keep the field optional or additive, deploy consumers compatibly, observe adoption, then remove old behavior deliberately."
+
+- description: "COMPLEX-05"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Tasks: A 2h; B 3h after A; C 2h independent; deadline 6h. Propose a feasible order."
+    expected_behavior: "Schedule A then B for 5h and C in parallel; finish within 6h."
+
+- description: "COMPLEX-06"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Queue depth rises, p95 doubles, error rate stays flat, and CPU is steady. What should be checked next?"
+    expected_behavior: "Treat queueing or downstream wait as hypotheses; inspect concurrency, dependency latency, and time-aligned traces before concluding."
+
+- description: "COMPLEX-07"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Design retries for idempotent requests that may receive 429, 503, or validation errors."
+    expected_behavior: "Retry transient 429/503 with bounded exponential backoff and jitter; do not retry validation errors; preserve idempotency."
+
+- description: "COMPLEX-08"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Design a large file import that can resume after a mid-file crash without duplicate rows."
+    expected_behavior: "Use stable record identities, checkpoints committed with writes, and idempotent upserts or transactional batches."
+
+- description: "COMPLEX-09"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "A multi-tenant endpoint accepts a user ID and record ID. Where should access be checked?"
+    expected_behavior: "Authenticate first, then authorize the record within the caller's tenant on every read or write."
+
+- description: "COMPLEX-10"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "A report total doubles after joining orders to multiple matching tags. Explain a safe correction."
+    expected_behavior: "Identify join fan-out; aggregate orders before joining or deduplicate by order identity without hiding valid rows."
+
+- description: "COMPLEX-11"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Defaults set timeout 30, file sets 20, environment sets 10. Which value should win under environment-over-file precedence?"
+    expected_behavior: "Return 10 and state the precedence order."
+
+- description: "COMPLEX-12"
+  metadata:
+    category: COMPLEX
+    source: held-out
+  vars:
+    prompt: "Propose a low-risk latency experiment with a fixed request budget and a rollback condition."
+    expected_behavior: "Use a small control/candidate sample, cap concurrency and total requests, compare p95 and errors, and define rollback thresholds."
+
+- description: "REASONING-01"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "All L are M. No M are S. Can any L be S?"
+    expected_behavior: "No; every L is M, and no M belongs to S."
+
+- description: "REASONING-02"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "Two independent events each occur with probability 10%. What is the chance both occur?"
+    expected_behavior: "Return 1%."
+
+- description: "REASONING-03"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "A condition affects 1% of people. A test has 90% sensitivity and 90% specificity. Given a positive, estimate the chance of the condition."
+    expected_behavior: "Compute 0.009 / (0.009 + 0.099), about 8.3%."
+
+- description: "REASONING-04"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "Three boxes labeled apples, oranges, and mixed are all mislabeled. One draw from the box labeled mixed gives an apple. Identify every box."
+    expected_behavior: "The mixed-labeled box contains apples; the orange-labeled box is mixed; the apple-labeled box contains oranges."
+
+- description: "REASONING-05"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "A implies B, and B is false. What follows about A? Does B being true prove A?"
+    expected_behavior: "A must be false; B being true does not prove A."
+
+- description: "REASONING-06"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "Two independent components each have 99.9% reliability and both must work. Find system reliability."
+    expected_behavior: "Return 0.999 squared, or 99.8001%."
+
+- description: "REASONING-07"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "A gamble pays $10 with 30% probability and loses $3 otherwise. Find expected value."
+    expected_behavior: "Calculate 3 minus 2.1, for expected gain of $0.90."
+
+- description: "REASONING-08"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "Ice-cream sales and drownings rise together in summer. Does this establish causation?"
+    expected_behavior: "No; season or temperature can affect both, so correlation alone is insufficient."
+
+- description: "REASONING-09"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "How many four-digit sequences use 1, 2, 3, 4 exactly once?"
+    expected_behavior: "Return 4 factorial, or 24."
+
+- description: "REASONING-10"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "Starting at n=5, repeatedly add n and subtract 2 until n is not positive. What is the sum?"
+    expected_behavior: "Add 5, 3, and 1; return 9."
+
+- description: "REASONING-11"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "A log query returns no matching entries. Can you conclude that no requests occurred?"
+    expected_behavior: "No; missing logs do not establish that requests did not occur."
+
+- description: "REASONING-12"
+  metadata:
+    category: REASONING
+    source: held-out
+  vars:
+    prompt: "Policy says every admin request is logged. A request was not logged. What can you infer?"
+    expected_behavior: "Either it was not an admin request or logging failed; do not infer which without evidence."
+
+- description: "PR-SIMPLE-01 | Status check"
+  metadata:
+    category: SIMPLE
+    source: pr-review
+  vars:
+    prompt: "Review this diff. The code must test whether an HTTP response succeeded.\n```diff\n- if (response.status === 200) {\n+ if (response.status = 200) {\n    return response.body;\n  }\n```"
+    expected_behavior: "The assignment mutates status and is truthy; use a comparison and handle non-success status."
+
+- description: "PR-SIMPLE-02 | Average"
+  metadata:
+    category: SIMPLE
+    source: pr-review
+  vars:
+    prompt: "Review this diff against the function name and docstring.\n```diff\n def average(values):\n     \"\"\"Return the arithmetic mean, or None for empty input.\"\"\"\n-    return sum(values) / len(values) if values else None\n+    return values[0] if values else None\n```"
+    expected_behavior: "The change returns only the first value, not the arithmetic mean."
+
+- description: "PR-SIMPLE-03 | Cleanup path"
+  metadata:
+    category: SIMPLE
+    source: pr-review
+  vars:
+    prompt: "Review this cleanup diff. CACHE_DIR may be unset.\n```diff\n- if [ -n \"$CACHE_DIR\" ]; then rm -rf \"$CACHE_DIR\"/*; fi\n+ rm -rf \"$CACHE_DIR\"/*\n```"
+    expected_behavior: "An unset variable can expand the glob to root files; validate a nonempty safe path before deletion."
+
+- description: "PR-MEDIUM-01 | Pagination"
+  metadata:
+    category: MEDIUM
+    source: pr-review
+  vars:
+    prompt: "Review this diff. The API may return multiple pages.\n```diff\n- for page in pages:\n+ for page in pages[:1]:\n      records.extend(page.items)\n```"
+    expected_behavior: "The slice silently drops every page after the first."
+
+- description: "PR-MEDIUM-02 | Retry filter"
+  metadata:
+    category: MEDIUM
+    source: pr-review
+  vars:
+    prompt: "Review this diff. The client retries failed requests.\n```diff\n- except (TimeoutError, RateLimitError):\n+ except Exception:\n      retry_request()\n```"
+    expected_behavior: "Retrying all exceptions also retries permanent validation/auth errors; restrict retries to transient failures."
+
+- description: "PR-MEDIUM-03 | Inclusive cursor"
+  metadata:
+    category: MEDIUM
+    source: pr-review
+  vars:
+    prompt: "Review this diff. The API contract includes records at the since timestamp.\n```diff\n- if record.created_at >= since:\n+ if record.created_at > since:\n      include(record)\n```"
+    expected_behavior: "The strict comparison drops records exactly at the inclusive since boundary."
+
+- description: "PR-COMPLEX-01 | Tenant cache"
+  metadata:
+    category: COMPLEX
+    source: pr-review
+  vars:
+    prompt: "Review this diff for isolation risks; record IDs are tenant-local.\n```diff\n- cache_key = f\"{tenant_id}:{record_id}\"\n+ cache_key = str(record_id)\n  return cache.get_or_load(cache_key, load_record)\n```"
+    expected_behavior: "Removing tenant identity allows one tenant's cached record to be returned to another."
+
+- description: "PR-COMPLEX-02 | Ownership check"
+  metadata:
+    category: COMPLEX
+    source: pr-review
+  vars:
+    prompt: "Review this endpoint. Authenticated users may request arbitrary invoice IDs.\n```diff\n  if user is None:\n      raise Unauthorized()\n+ return db.get_invoice(invoice_id)\n- return db.get_invoice_for_owner(invoice_id, user.id)\n```"
+    expected_behavior: "Authentication does not authorize ownership; restore a user-scoped invoice lookup."
+
+- description: "PR-COMPLEX-03 | Balance race"
+  metadata:
+    category: COMPLEX
+    source: pr-review
+  vars:
+    prompt: "Review this withdrawal update under concurrent requests.\n```diff\n  balance = read_balance(account_id)\n  if balance >= amount:\n-     subtract_balance(account_id, amount)\n+     write_balance(account_id, balance - amount)\n      approve()\n```"
+    expected_behavior: "Read-check-write is non-atomic and can overdraw; use a conditional atomic update or transaction."
+
+- description: "PR-REASONING-01 | Retry identity"
+  metadata:
+    category: REASONING
+    source: pr-review
+  vars:
+    prompt: "Review retry behavior. The payment service deduplicates by idempotency key.\n```diff\n  for attempt in range(max_retries + 1):\n-     key = operation_id\n+     key = f\"{operation_id}:{attempt}\"\n      send_payment(key)\n```"
+    expected_behavior: "Changing the key per attempt defeats deduplication and can create duplicate payments; keep it stable per operation."
+
+- description: "PR-REASONING-02 | Async lock"
+  metadata:
+    category: REASONING
+    source: pr-review
+  vars:
+    prompt: "Review whether the lock covers all work.\n```diff\n  lock = acquire_lock(resource_id)\n  task = update_resource(resource_id)\n+ release_lock(lock)\n  await task\n- release_lock(lock)\n```"
+    expected_behavior: "The lock is released before the asynchronous update completes, allowing overlapping updates."
+
+- description: "PR-REASONING-03 | Lease expiry"
+  metadata:
+    category: REASONING
+    source: pr-review
+  vars:
+    prompt: "A distributed lease initially lasts thirty seconds; this operation can take twenty seconds. Review the change.\n```diff\n- lease = acquire_lease(key, ttl=30)\n+ lease = acquire_lease(key, ttl=5)\n  await process_large_batch()\n  commit_results()\n```"
+    expected_behavior: "The shorter lease can expire mid-operation and admit a second worker; renew it or use fencing/atomic ownership."
