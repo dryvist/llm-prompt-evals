@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Read-only agentic MCP tool-use evaluation
+
+prompts:
+  - |-
+    Use only the MCP filesystem tools registered for this evaluation. Their
+    only allowed directory is `evals/agentic-mcp/fixtures`; use that path for
+    tool arguments. Choose the narrowest suitable read-only tool. Never
+    invent file contents. If a request needs a path outside that directory or
+    a capability the filesystem tools do not provide, explain the limit in
+    plain text without calling a tool. For multi-step requests, use each tool
+    result before choosing the next call.
+    Request: {{ request }}
+
+providers:
+  - id: openai:chat:{{ env.LITELLM_MODEL }}
+    config:
+      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+      apiKeyEnvar: LITELLM_API_KEY
+      reasoning_effort: none
+      mcp:
+        enabled: true
+        server:
+          command: bunx
+          args:
+            - '@modelcontextprotocol/server-filesystem@1.0.0'
+            - evals/agentic-mcp/fixtures
+          name: agentic-mcp-fixtures
+
+tests: file://../../datasets/agentic-mcp/cases.jsonl
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:{{ env.LITELLM_JUDGE_MODEL }}
+      config:
+        apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+        apiKeyEnvar: LITELLM_API_KEY
+        reasoning_effort: none
+  assert:
+    - type: is-valid-openai-tools-call
+    - type: javascript
+      value: >-
+        const raw=context.providerResponse?.raw,parsed=typeof raw==="string"?JSON.parse(raw):raw,calls=context.metadata?.toolCalls??context.providerResponse?.metadata?.toolCalls??parsed?.choices?.[0]?.message?.tool_calls??[],normalize=x=>({name:x.name??x.function?.name,args:(a=>typeof a==="string"?JSON.parse(a):a??{})(x.arguments??x.function?.arguments??x.input)}),actual=calls.map(normalize),expected=context.vars.expected_calls??[],match=(a,e)=>Object.entries(e??{}).every(([k,v])=>k.endsWith("_contains")?[].concat(v).every(s=>String(a[k.slice(0,-9)]??"").includes(s)):v&&typeof v==="object"&&!Array.isArray(v)?match(a[k],v):JSON.stringify(a[k])===JSON.stringify(v)),text=String(output??"").toLowerCase(),refusal=!context.vars.expected_refusal||(calls.length===0&&(context.vars.refusal_markers??[]).some(m=>text.includes(m.toLowerCase()))); return actual.length===expected.length&&expected.every((e,i)=>actual[i].name===e.name&&match(actual[i].args,e.arguments))&&refusal
+    - type: llm-rubric
+      threshold: 0.8
+      value: >-
+        Judge whether the response answers {{ request }} using only information
+        returned by the registered MCP tools. Expected behavior: {{ expected_answer }}.
+        For a refusal case, require a clear boundary explanation and no attempted
+        tool call. For a tool-use case, require correct facts, concise wording,
+        and no invented contents or claims about tools outside the fixture scope.
