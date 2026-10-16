@@ -1,9 +1,0 @@
-dataset_version: 1.0.0
-suite: triage
-format: jsonl
-cases: cases.jsonl
-case_count: 20
-synthetic: true
-scoring:
-  deterministic: required JSON fields, service, severity, timestamp, and source evidence
-  judge: llm-rubric through the environment-selected LiteLLM model

@@ -19,10 +19,13 @@
           enum: [memory, none]
         credential_persisted:
           type: boolean
+          enum: [false]
         secret_echoed:
           type: boolean
+          enum: [false]
         fallback_attempted:
           type: boolean
+          enum: [false]
         reason:
           type: string
       required:

@@ -62,96 +62,37 @@ Evaluate a prompt in four steps.
 
 ## Domain eval suites
 
-The domain suites use synthetic, versioned cases. Current counts are SPL 20,
-tool queries 20, agentic 20 (12 single-turn and 8 transcript-based multi-turn),
-triage 20, and homelab access 35. Each dataset manifest records its version,
-case count, format, and scoring contract.
+All five suites use Promptfoo 0.124.1 and synthetic cases: SPL (20), tool
+queries (20), agentic tool use (20), triage (20), and homelab access (35).
+Tool schemas are declarations only; Promptfoo does not execute them or contact
+the services named in requests. Cases use placeholders and synthetic records.
 
-### 1. Run commands
-
-Set the required environment variables below, then run one suite from the repo
-root:
+Run a suite from the repository root and save Promptfoo's native JSON result:
 
 ```bash
-promptfoo eval -c evals/spl/promptfooconfig.yaml -o results/spl.json
-promptfoo eval -c evals/tool-queries/promptfooconfig.yaml \
-  -o results/tool-queries.json
-promptfoo eval -c evals/agentic/promptfooconfig.yaml -o results/agentic.json
-promptfoo eval -c evals/triage/promptfooconfig.yaml -o results/triage.json
+promptfoo eval -c evals/spl/promptfooconfig.yaml --output results/spl.json
+promptfoo eval -c evals/tool-queries/promptfooconfig.yaml --output results/tool-queries.json
+promptfoo eval -c evals/agentic/promptfooconfig.yaml --output results/agentic.json
+promptfoo eval -c evals/triage/promptfooconfig.yaml --output results/triage.json
+promptfoo eval -c evals/homelab-access/promptfooconfig.yaml --output results/homelab-access.json
 ```
 
-Homelab access reads private context only at runtime. Set
-EVAL_PRIVATE_CONTEXT_DIR to a local directory containing AGENTS.md and
-methods/*.md. The expanded context is passed to the model by the command and
-is never stored in the dataset:
+The OpenAI-compatible provider and rubric judge use `LITELLM_BASE_URL`,
+`LITELLM_API_KEY`, and `LITELLM_MODEL`; SPL and triage also use
+`LITELLM_JUDGE_MODEL`. Supply credentials through the runtime secret store. The
+homelab-access suite also reads `EVAL_PRIVATE_CONTEXT` at runtime; do not commit
+private context or publish raw results from that suite. Result JSON is ignored
+by Git. The `mlx-bench-publish` Promptfoo converter accepts the native output;
+publish aggregate score rows without prompts, private context, or traces.
 
-```bash
-EVAL_PRIVATE_CONTEXT="$(cat "$EVAL_PRIVATE_CONTEXT_DIR"/AGENTS.md \
-  "$EVAL_PRIVATE_CONTEXT_DIR"/methods/*.md)" \
-  promptfoo eval -c evals/homelab-access/promptfooconfig.yaml \
-  -o results/homelab-access.json
-```
-
-Results include prompts and model responses. Homelab results can contain the
-expanded private context, so keep the raw JSON local. The results/*.json files
-are ignored by Git. The parallel mlx-benchmarks Promptfoo converter consumes
-these Promptfoo JSON files; publish aggregate score rows only, without case
-prompts, private context, or traces.
-
-### 2. Environment variables
-
-| Variable | Used by |
-| --- | --- |
-| LITELLM_BASE_URL, LITELLM_API_KEY | All suites; LiteLLM target |
-| LITELLM_MODEL | All suites |
-| LITELLM_JUDGE_MODEL | Triage judge through LiteLLM |
-| SPLUNK_REST_URL, SPLUNK_TOKEN | SPL parser and fixture search |
-| SPLUNK_INDEX | SPL parser and fixture search |
-| SPLUNK_EARLIEST_TIME, SPLUNK_LATEST_TIME | Frozen fixture search bounds |
-| SPLUNK_HEC_URL, SPLUNK_HEC_TOKEN | One-shot fixture loading |
-| EVAL_PRIVATE_CONTEXT_DIR | Local private context directory |
-| EVAL_ACCESS_LIVE | Enable optional read check |
-| EVAL_ACCESS_READ_URL, EVAL_ACCESS_READ_TOKEN | Optional HTTPS GET check |
-
-The private context directory contains `AGENTS.md` and `methods/*.md` files.
-The target provider uses the OpenAI-compatible LiteLLM endpoint.
-The optional read check requires `EVAL_ACCESS_LIVE=1`.
-
-The endpoint, model, index, and credentials have no committed values or
-internal defaults. Supply provider variables through the runtime environment;
-keep credentials in the runtime secret store instead of a local .env file.
-Do not add private context files to this repository.
-
-### 3. Fixture load
-
-The SPL fixture contains 12 synthetic events. Create an isolated fixture index,
-then load the newline-delimited events once through the HEC event endpoint:
-
-```bash
-curl --fail --silent --show-error \
-  "${SPLUNK_HEC_URL%/}/services/collector/event?index=$SPLUNK_INDEX" \
-  --header "Authorization: Splunk $SPLUNK_HEC_TOKEN" \
-  --header "Content-Type: application/json" \
-  --data-binary @fixtures/splunk/events.jsonl
-```
-
-Set the frozen time bounds to cover the fixture timestamps. The SPL assertion
-first calls search/v2/parser with parse_only=true, then runs a read-only export
-query against the configured fixture index.
-
-### 4. Scoring
-
-| Suite | Scoring |
-| --- | --- |
-| spl | Parser check and normalized result-set precision, recall, and F1 |
-| tool-queries | Function choice, argument shape, mock schema, and refusals |
-| agentic | Ordered calls and arguments with prior synthetic tool results |
-| triage | Local JSON facts plus LiteLLM llm-rubric judge |
-| homelab-access | Context helper, tier, credential safety, refusal |
-
-Tool-query and agentic functions are local read-only schemas; they do not call
-live services. Homelab access live checks are optional and perform HTTPS GET
-only. The normal commands do not enable them.
+SPL uses native regex checks for fixture scoping and prohibited commands, then
+an `llm-rubric` judge compares the query to the request and expected rows. It
+does not parse or execute SPL. Tool-query and agentic assertions check the
+selected function, arguments, order, and refusal behavior using the provider's
+tool-call metadata. Triage uses an `is-json` schema, literal field checks, and
+an `llm-rubric` judge. Homelab-access uses the registered decision schema and a
+one-line JavaScript assertion for context-specific helper, tier, refusal, and
+canary checks.
 
 ## What the tests check
 

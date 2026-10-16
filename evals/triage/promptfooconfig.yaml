@@ -27,12 +27,36 @@ defaultTest:
         apiKeyEnvar: LITELLM_API_KEY
         reasoning_effort: none
   assert:
-    - type: python
-      value: file://../../scorers/domain_assertions.py:assert_triage
+    - type: is-json
+      value:
+        type: object
+        required: [summary, service, severity, timeline, next_steps, unknowns]
+        properties:
+          summary: {type: string}
+          service: {type: string}
+          severity: {type: string}
+          timeline:
+            type: array
+            items:
+              type: object
+              required: [time, evidence]
+              properties:
+                time: {type: string}
+                evidence: {type: string}
+          next_steps: {type: array}
+          unknowns: {type: array}
+    - type: contains
+      value: "{{expected.service}}"
+    - type: contains
+      value: "{{expected.severity}}"
+    - type: contains
+      value: "{{expected.time}}"
+    - type: contains
+      value: "{{expected.evidence}}"
     - type: llm-rubric
       threshold: 0.8
-      value: |-
-        Grade only against the supplied synthetic bundle. Reward a concise,
-        accurate timeline with evidence citations, correct service and severity,
-        useful next steps, and explicit unknowns. Penalize unsupported causes,
-        invented events, omitted key facts, and unsafe actions.
+      value: >-
+        Judge the JSON response against the supplied synthetic incident bundle
+        and expected fields {{ expected | dump }}. Require a correct timeline,
+        evidence, service and severity. Reward useful safe next steps and clear
+        unknowns. Penalize invented facts, causes, actions or events.
