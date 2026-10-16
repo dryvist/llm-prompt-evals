@@ -118,8 +118,9 @@ The target provider uses the OpenAI-compatible LiteLLM endpoint.
 The optional read check requires `EVAL_ACCESS_LIVE=1`.
 
 The endpoint, model, index, and credentials have no committed values or
-internal defaults. Put local values in the ignored .env file or export them in
-the shell. Do not add private context files to this repository.
+internal defaults. Supply provider variables through the runtime environment;
+keep credentials in the runtime secret store instead of a local .env file.
+Do not add private context files to this repository.
 
 ### 3. Fixture load
 
