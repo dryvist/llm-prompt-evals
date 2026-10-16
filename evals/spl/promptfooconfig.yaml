@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Synthetic NL-to-SPL query evaluation
+
+prompts:
+  - |-
+    Write one read-only SPL query for this request. Use only the supplied synthetic
+    fixture index and the frozen time bounds. Return the query only, without
+    Markdown fences.
+    Index: {{ env.SPLUNK_INDEX }}
+    Time bounds: {{ env.SPLUNK_EARLIEST_TIME }} through {{ env.SPLUNK_LATEST_TIME }}
+    Available fields: request_id, service, severity, status, duration_ms, endpoint.
+    Request: {{ request }}
+
+providers:
+  - id: openai:chat:{{ env.LITELLM_MODEL }}
+    config:
+      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+      apiKeyEnvar: LITELLM_API_KEY
+      reasoning_effort: none
+
+tests: file://../../datasets/spl/cases.jsonl
+
+defaultTest:
+  assert:
+    - type: python
+      value: file://../../scorers/domain_assertions.py:assert_spl

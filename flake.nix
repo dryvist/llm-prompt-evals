@@ -35,7 +35,7 @@
           # both the stable and unstable channels, so we run it through bun
           # instead: `bun` is the nix-provided binary, `bunx` fetches the exact
           # pinned promptfoo at first use. No custom derivation, no global npm.
-          promptfooVersion = "0.121.19";
+          promptfooVersion = "0.124.1";
           promptfooShim = pkgs.writeShellScriptBin "promptfoo" ''
             exec ${pkgs.lib.getExe pkgs.bun} x promptfoo@${promptfooVersion} "$@"
           '';

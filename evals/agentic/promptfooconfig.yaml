@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Read-only single-step and transcript-based agent tool evaluation
+
+prompts:
+  - |-
+    Use only registered read-only functions. Read the transcript as completed
+    earlier turns with synthetic tool results, then handle the current request.
+    Preserve turn order and prior constraints. Do not make up tool results,
+    credentials, hosts, or mutations. If a request is unsafe or underspecified,
+    refuse or ask without calling a tool.
+    Prior turns: {{ history | dump }}
+    Current request: {{ request }}
+
+providers:
+  - id: openai:chat:{{ env.LITELLM_MODEL }}
+    config:
+      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+      apiKeyEnvar: LITELLM_API_KEY
+      reasoning_effort: none
+      tools: file://../../tools/query-tools.yaml
+      tool_choice: auto
+
+tests: file://../../datasets/agentic/cases.jsonl
+
+defaultTest:
+  assert:
+    - type: python
+      value: file://../../scorers/domain_assertions.py:assert_tool_calls

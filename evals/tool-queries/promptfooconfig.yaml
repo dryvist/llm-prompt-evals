@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Read-only query and tool-argument evaluation
+
+prompts:
+  - |-
+    Choose the single best registered read-only function and supply arguments
+    from the request. Never invent a host, credential, owner, or tool. If the
+    request asks for a mutation or lacks a required identifier, refuse or ask
+    without calling a tool.
+    Request: {{ request }}
+
+providers:
+  - id: openai:chat:{{ env.LITELLM_MODEL }}
+    config:
+      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+      apiKeyEnvar: LITELLM_API_KEY
+      reasoning_effort: none
+      tools: file://../../tools/query-tools.yaml
+      tool_choice: auto
+
+tests: file://../../datasets/tool-queries/cases.jsonl
+
+defaultTest:
+  assert:
+    - type: python
+      value: file://../../scorers/domain_assertions.py:assert_tool_calls

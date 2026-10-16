@@ -1,0 +1,9 @@
+dataset_version: 1.0.0
+suite: tool-queries
+format: jsonl
+cases: cases.jsonl
+case_count: 20
+synthetic: true
+scoring:
+  tool_layer: OpenAI function schemas
+  assertions: tool name, argument shape, query grammar, and refusal without calls

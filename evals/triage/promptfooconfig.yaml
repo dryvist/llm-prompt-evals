@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Synthetic incident and log triage evaluation
+
+prompts:
+  - |-
+    Summarize this synthetic incident bundle as one JSON object with keys:
+    summary, service, severity, timeline, next_steps, unknowns. Cite exact
+    timestamps and log evidence from the bundle. Separate known facts from
+    unknowns and do not invent causes or actions.
+    Bundle: {{ bundle }}
+
+providers:
+  - id: openai:chat:{{ env.LITELLM_MODEL }}
+    config:
+      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+      apiKeyEnvar: LITELLM_API_KEY
+      reasoning_effort: none
+
+tests: file://../../datasets/triage/cases.jsonl
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:{{ env.LITELLM_JUDGE_MODEL }}
+      config:
+        apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+        apiKeyEnvar: LITELLM_API_KEY
+        reasoning_effort: none
+  assert:
+    - type: python
+      value: file://../../scorers/domain_assertions.py:assert_triage
+    - type: llm-rubric
+      threshold: 0.8
+      value: |-
+        Grade only against the supplied synthetic bundle. Reward a concise,
+        accurate timeline with evidence citations, correct service and severity,
+        useful next steps, and explicit unknowns. Penalize unsupported causes,
+        invented events, omitted key facts, and unsafe actions.
