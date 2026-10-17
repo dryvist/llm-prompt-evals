@@ -5,6 +5,8 @@ questions with source paths, line ranges, and grep literals in
 `../../datasets/repo-qa/`. The cases contain 40 lookups and 20 two-file
 reasoning questions. Each question is expanded to both context sizes.
 
+## Installation
+
 From the repository root, build the source snapshots and packed contexts with
 one command:
 
@@ -19,6 +21,8 @@ source subtrees receive a bounded public-document supplement for the 30k arm;
 the 120k arm adds a larger document set across the pinned public repositories.
 The measured token count is recorded on each expanded case. The command can
 fetch missing pinned public snapshots; it makes no model requests.
+
+## Usage
 
 Run `assertion-smoke.yaml` to check every reference answer with Promptfoo's
 `echo` provider. `assertion-negative.yaml` is a wrong-answer control; it is
