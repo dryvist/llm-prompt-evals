@@ -1,0 +1,23 @@
+{
+  "__global_distractors": ["README.md", "docs/**/*.md"],
+  "apai-gpu": ["ansible-proxmox-ai/roles/nvidia_gpu_guest/**", "ansible-proxmox-ai/llm-models.d/30-local-gpu.yml"],
+  "apai-phoenix": ["ansible-proxmox-ai/roles/phoenix_docker/**", "ansible-proxmox-ai/tests/phoenix_docker/**"],
+  "apai-campaign": ["ansible-proxmox-ai/playbooks/llm-model-campaign.yml", "ansible-proxmox-ai/playbooks/tasks/llm-model-campaign-*.yml", "ansible-proxmox-ai/playbooks/templates/llm-model-campaign-*.j2"],
+  "ap-client": ["ansible-proxmox/playbooks/benchmark-client.yml", "ansible-proxmox/playbooks/tasks/benchmark-client/**"],
+  "ap-tests": ["ansible-proxmox/tests/**", "ansible-proxmox/molecule/ssh_ca_trust/**"],
+  "tofu-vars": ["tofu-proxmox/variables.tf", "tofu-proxmox/modules/acme-certificate/**"],
+  "tofu-vm": ["tofu-proxmox/modules/proxmox-vm/**"],
+  "tofu-stack": ["tofu-proxmox/modules/proxmox-stack/variables-containers.tf", "tofu-proxmox/modules/proxmox-stack/locals.tf", "tofu-proxmox/modules/proxmox-stack/tests/llm_gpu_engine_set.tftest.hcl"],
+  "iac-deploy": ["iac-platform/scripts/deploy.sh", "iac-platform/scripts/openbao-exec-env.sh"],
+  "iac-tests": ["iac-platform/tests/**", "iac-platform/scripts/openbao-exec-env.sh"],
+  "iac-semaphore": ["iac-platform/scripts/semaphore-run-ansible.sh", "iac-platform/tests/semaphore-run-ansible.sh"],
+  "mlx-schema": ["mlx-benchmarks/schema.json"],
+  "mlx-tests": ["mlx-benchmarks/tests/test_result_contract.py", "mlx-benchmarks/tests/test_promptfoo_converter.py", "mlx-benchmarks/src/mlx_benchmarks/result_contract.py"],
+  "mlx-privacy": ["mlx-benchmarks/src/mlx_benchmarks/privacy.py", "mlx-benchmarks/tests/test_privacy.py"],
+  "contracts-schema": ["homelab-contracts/schemas/**", "homelab-contracts/ansible/roles/llm_roles/**", "homelab-contracts/tests/llm_roles/**"],
+  "contracts-roles": ["homelab-contracts/ansible/roles/llm_roles/**", "homelab-contracts/tests/llm_roles/**"],
+  "contracts-catalog": ["homelab-contracts/ansible/roles/llm_model_catalog/**", "homelab-contracts/tests/llm_model_catalog/**"],
+  "evals-config": ["llm-prompt-evals/evals/homelab-access/**", "llm-prompt-evals/tools/homelab-decision.yaml", "llm-prompt-evals/datasets/homelab-access/cases.jsonl"],
+  "evals-data": ["llm-prompt-evals/datasets/homelab-access/**", "llm-prompt-evals/evals/homelab-access/**", "llm-prompt-evals/evals/tool-queries/**", "llm-prompt-evals/evals/agentic/**"],
+  "evals-flake": ["llm-prompt-evals/flake.nix", "llm-prompt-evals/README.md", "llm-prompt-evals/.github/workflows/eval.yml", "llm-prompt-evals/evals/**"]
+}
