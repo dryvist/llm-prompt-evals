@@ -28,7 +28,7 @@ Run `assertion-smoke.yaml` to check every reference answer with Promptfoo's
 `echo` provider. `assertion-negative.yaml` is a wrong-answer control; it is
 expected to report one pass and one failure.
 
-`promptfooconfig.yaml` is the reasoning-off arm (256 output tokens).
+`promptfooconfig.yaml` is the reasoning-off arm (4096 output tokens).
 `promptfooconfig.xhigh.yaml` runs the same cases at `reasoning_effort: xhigh`
 with 98304 output tokens; for the 120k contexts, lower it to what the
 serving slot leaves after the prompt. Answers are matched case-insensitively.
