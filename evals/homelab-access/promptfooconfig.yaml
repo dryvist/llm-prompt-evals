@@ -20,7 +20,11 @@ providers:
     config:
       apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
       apiKeyEnvar: LITELLM_API_KEY
-      reasoning_effort: none
+      max_tokens: 256
+      temperature: 0
+      passthrough:
+        chat_template_kwargs:
+          enable_thinking: false
       tools: file://../../tools/homelab-decision.yaml
       tool_choice: auto
 
