@@ -14,7 +14,7 @@ providers:
     config:
       apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
       apiKeyEnvar: LITELLM_API_KEY
-      max_tokens: 16384
+      max_tokens: 98304
       temperature: 0
       passthrough:
         chat_template_kwargs:
