@@ -23,3 +23,7 @@ fetch missing pinned public snapshots; it makes no model requests.
 Run `assertion-smoke.yaml` to check every reference answer with Promptfoo's
 `echo` provider. `assertion-negative.yaml` is a wrong-answer control; it is
 expected to report one pass and one failure.
+
+`promptfooconfig.yaml` is the reasoning-off arm (256 output tokens).
+`promptfooconfig.xhigh.yaml` runs the same cases at `reasoning_effort: xhigh`
+with 16384 output tokens. Answers are matched case-insensitively.
