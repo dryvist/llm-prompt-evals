@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: One-case Echo provider smoke for benchmark runners; makes no model request
+
+prompts:
+  - "{{ reference }}"
+
+providers:
+  - echo
+
+tests:
+  - description: echo-smoke
+    vars:
+      reference: deployment.json
+    assert:
+      - type: icontains
+        value: deployment.json
