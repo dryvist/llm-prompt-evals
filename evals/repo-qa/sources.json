@@ -1,0 +1,9 @@
+[
+  {"name":"ansible-proxmox-ai","visibility":"PUBLIC","default_branch":"develop","commit":"73e3e5ebcf1ab712e5bf7ea0fe1319dd08ec023e"},
+  {"name":"ansible-proxmox","visibility":"PUBLIC","default_branch":"develop","commit":"3e3444a0cb28c7ce0b1939c1dd4cc2362c8c0f04"},
+  {"name":"tofu-proxmox","visibility":"PUBLIC","default_branch":"develop","commit":"97d4471bfc8e636c5fda1fb0224c17e6b93df021"},
+  {"name":"iac-platform","visibility":"PUBLIC","default_branch":"main","commit":"02230b4b106e955ddd2c2ce5eff040d17aae72ca"},
+  {"name":"mlx-benchmarks","visibility":"PUBLIC","default_branch":"main","commit":"166d38a3c073acaa9e3f5b359ab9cce65858fea6"},
+  {"name":"homelab-contracts","visibility":"PUBLIC","default_branch":"main","commit":"c17a5b4eceeca6f050e9df610e15da7c0a8695e0"},
+  {"name":"llm-prompt-evals","visibility":"PUBLIC","default_branch":"develop","commit":"e8f8dc9c549badd887615a7323cc9a6955d24d44"}
+]

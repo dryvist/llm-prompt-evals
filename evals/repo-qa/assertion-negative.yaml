@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Deterministic wrong-answer control
+
+prompts:
+  - "{{ reference }}"
+  - "{{ reference }} incorrect"
+
+providers:
+  - echo
+
+tests:
+  - description: reference answer passes and wrong output fails
+    vars:
+      reference: llamacpp_serving_engine
+    assert:
+      - type: equals
+        value: llamacpp_serving_engine
