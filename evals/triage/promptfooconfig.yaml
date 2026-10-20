@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Synthetic incident and log triage evaluation
+
+prompts:
+  - |-
+    Summarize this synthetic incident bundle as one JSON object with keys:
+    summary, service, severity, timeline, next_steps, unknowns. Cite exact
+    timestamps and log evidence from the bundle. Separate known facts from
+    unknowns and do not invent causes or actions.
+    Bundle: {{ bundle }}
+
+providers:
+  - id: openai:chat:{{ env.LITELLM_MODEL }}
+    config:
+      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+      apiKeyEnvar: LITELLM_API_KEY
+      reasoning_effort: none
+
+tests: file://../../datasets/triage/cases.jsonl
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:{{ env.LITELLM_JUDGE_MODEL }}
+      config:
+        apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+        apiKeyEnvar: LITELLM_API_KEY
+        reasoning_effort: none
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required: [summary, service, severity, timeline, next_steps, unknowns]
+        properties:
+          summary: {type: string}
+          service: {type: string}
+          severity: {type: string}
+          timeline:
+            type: array
+            items:
+              type: object
+              required: [time, evidence]
+              properties:
+                time: {type: string}
+                evidence: {type: string}
+          next_steps: {type: array}
+          unknowns: {type: array}
+    - type: contains
+      value: "{{expected.service}}"
+    - type: contains
+      value: "{{expected.severity}}"
+    - type: contains
+      value: "{{expected.time}}"
+    - type: contains
+      value: "{{expected.evidence}}"
+    - type: llm-rubric
+      threshold: 0.8
+      value: >-
+        Judge the JSON response against the supplied synthetic incident bundle
+        and expected fields {{ expected | dump }}. Require a correct timeline,
+        evidence, service and severity. Reward useful safe next steps and clear
+        unknowns. Penalize invented facts, causes, actions or events.

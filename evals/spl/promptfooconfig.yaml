@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Synthetic NL-to-SPL query evaluation
+
+prompts:
+  - |-
+    Write one read-only SPL search for the request using the synthetic
+    fixture_events index. Start with `search index=fixture_events`, include a
+    pipe for the requested fields or aggregation. Available fields are
+    request_id, service, severity, status, duration_ms, and endpoint. Return
+    the query only.
+    Request: {{ request }}
+
+providers:
+  - id: openai:chat:{{ env.LITELLM_MODEL }}
+    config:
+      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+      apiKeyEnvar: LITELLM_API_KEY
+      reasoning_effort: none
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:{{ env.LITELLM_JUDGE_MODEL }}
+      config:
+        apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+        apiKeyEnvar: LITELLM_API_KEY
+        reasoning_effort: none
+  assert:
+    - type: regex
+      value: '^\s*search\s+index=fixture_events\b.*\|'
+    - type: not-regex
+      value: '\b([dD][eE][lL][eE][tT][eE]|[cC][oO][lL][lL][eE][cC][tT]|[oO][uU][tT][pP][uU][tT][lL][oO][oO][kK]|[sS][eE][nN][dD][eE][mM][aA][iI][lL]|[sS][cC][rR][iI][pP][tT])\b'
+    - type: llm-rubric
+      threshold: 0.8
+      value: >-
+        Judge whether this read-only SPL query answers {{ request }} using the
+        fixture_events index and computes the expected rows {{ expected_rows | dump }}.
+        Reject unrelated fields, missing filters or aggregations, unsafe commands,
+        and claims the query cannot produce.
+
+tests: file://../../datasets/spl/cases.jsonl

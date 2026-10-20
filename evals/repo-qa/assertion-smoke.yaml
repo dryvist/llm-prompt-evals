@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Deterministic assertion pass for all packed repo-qa cases
+
+prompts:
+  - "{{ reference }}"
+
+providers:
+  - echo
+
+tests: file://.generated/cases.jsonl
+
+defaultTest:
+  assert:
+    - type: equals
+      value: "{{ reference }}"

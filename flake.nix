@@ -35,14 +35,19 @@
           # both the stable and unstable channels, so we run it through bun
           # instead: `bun` is the nix-provided binary, `bunx` fetches the exact
           # pinned promptfoo at first use. No custom derivation, no global npm.
-          promptfooVersion = "0.121.19";
+          promptfooVersion = "0.124.1";
+          repomixVersion = "1.18.1";
           promptfooShim = pkgs.writeShellScriptBin "promptfoo" ''
             exec ${pkgs.lib.getExe pkgs.bun} x promptfoo@${promptfooVersion} "$@"
+          '';
+          repomixShim = pkgs.writeShellScriptBin "repomix" ''
+            exec ${pkgs.lib.getExe pkgs.bun} x repomix@${repomixVersion} "$@"
           '';
         in
         {
           devShells.default = pkgs.mkShell {
             packages = [
+              repomixShim
               promptfooShim # `promptfoo …` -> `bunx promptfoo@<pinned> …`
             ]
             ++ (with pkgs; [

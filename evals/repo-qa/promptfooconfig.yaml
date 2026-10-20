@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Pinned-repository knowledge evaluation with deterministic assertions
+
+prompts:
+  - |-
+    Answer only from the supplied repository context. Return a short, exact
+    answer. If the evidence is missing, say UNVERIFIED.
+    Repository context:
+    {{ context }}
+    Question: {{ question }}
+
+providers:
+  - id: openai:chat:{{ env.LITELLM_MODEL }}
+    config:
+      apiBaseUrl: "{{ env.LITELLM_BASE_URL }}"
+      apiKeyEnvar: LITELLM_API_KEY
+      max_tokens: 4096
+      temperature: 0
+      passthrough:
+        chat_template_kwargs:
+          enable_thinking: false
+
+tests: file://.generated/cases.jsonl
+
+defaultTest:
+  vars:
+    reasoning_effort: "off"

@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "id": "item-4",
+      "name": "Amber Lamp",
+      "status": "active",
+      "category": "lighting"
+    },
+    {
+      "id": "item-9",
+      "name": "Blue Vase",
+      "status": "archived",
+      "category": "decor"
+    }
+  ]
+}

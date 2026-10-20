@@ -60,6 +60,40 @@ Evaluate a prompt in four steps.
    Want a file to share instead? Run `./scripts/report.sh`. It writes
    `output/latest.html` (open it in any browser) and a short `output/latest.md`.
 
+## Domain eval suites
+
+All five suites use Promptfoo 0.124.1 and synthetic cases: SPL (20), tool
+queries (20), agentic tool use (20), triage (20), and homelab access (35).
+Tool schemas are declarations only; Promptfoo does not execute them or contact
+the services named in requests. Cases use placeholders and synthetic records.
+
+Run a suite from the repository root and save Promptfoo's native JSON result:
+
+```bash
+promptfoo eval -c evals/spl/promptfooconfig.yaml --output results/spl.json
+promptfoo eval -c evals/tool-queries/promptfooconfig.yaml --output results/tool-queries.json
+promptfoo eval -c evals/agentic/promptfooconfig.yaml --output results/agentic.json
+promptfoo eval -c evals/triage/promptfooconfig.yaml --output results/triage.json
+promptfoo eval -c evals/homelab-access/promptfooconfig.yaml --output results/homelab-access.json
+```
+
+The OpenAI-compatible provider and rubric judge use `LITELLM_BASE_URL`,
+`LITELLM_API_KEY`, and `LITELLM_MODEL`; SPL and triage also use
+`LITELLM_JUDGE_MODEL`. Supply credentials through the runtime secret store. The
+homelab-access suite also reads `EVAL_PRIVATE_CONTEXT` at runtime; do not commit
+private context or publish raw results from that suite. Result JSON is ignored
+by Git. The `mlx-bench-publish` Promptfoo converter accepts the native output;
+publish aggregate score rows without prompts, private context, or traces.
+
+SPL uses native regex checks for fixture scoping and prohibited commands, then
+an `llm-rubric` judge compares the query to the request and expected rows. It
+does not parse or execute SPL. Tool-query and agentic assertions check the
+selected function, arguments, order, and refusal behavior using the provider's
+tool-call metadata. Triage uses an `is-json` schema, literal field checks, and
+an `llm-rubric` judge. Homelab-access uses the registered decision schema and a
+one-line JavaScript assertion for context-specific helper, tier, refusal, and
+canary checks.
+
 ## What the tests check
 
 Each test sends a question to a model running the prompt, then scores the answer
