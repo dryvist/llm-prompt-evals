@@ -56,7 +56,6 @@
               python3 # prompts/load_okf.py
               pre-commit
               gitleaks
-              git
               jq
             ]);
 
