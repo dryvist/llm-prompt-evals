@@ -16,6 +16,7 @@
 
 * **agentic:** reword the suite description and prompt history wording ([#130](https://github.com/dryvist/llm-prompt-evals/issues/130)) ([3488d6e](https://github.com/dryvist/llm-prompt-evals/commit/3488d6ebe4bf9bf4b0663f3fc8a5e5b309d7cf7a))
 * configure homelab access OFF arm ([665d0dc](https://github.com/dryvist/llm-prompt-evals/commit/665d0dcf040b9be8cea0a5526649daa133566696))
+* **devshell:** use the system git instead of a pinned git ([80feff1](https://github.com/dryvist/llm-prompt-evals/commit/80feff199b077c779a394554833bb26f90b84e0d))
 * **homelab-access:** parse provider output only when it is JSON ([b710129](https://github.com/dryvist/llm-prompt-evals/commit/b7101295b4dd94510ec0f2ecb538804c0b9e35c4))
 * **homelab-access:** stop requiring a tool call on ask and refuse cases ([9ccbdcc](https://github.com/dryvist/llm-prompt-evals/commit/9ccbdcce5ce888827d9ff2593be0dd1163526c55))
 * restore release metadata baseline ([#134](https://github.com/dryvist/llm-prompt-evals/issues/134)) ([e89e1a1](https://github.com/dryvist/llm-prompt-evals/commit/e89e1a1e7639164ff653af7cba18445334ec0358))
