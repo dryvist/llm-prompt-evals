@@ -1,0 +1,18 @@
+description: Offline heldout comparison smoke where candidate matches baseline
+
+# Promptfoo merges prompts with identical text into one, so the candidate must
+# differ from the baseline. `contains` lets both prompts pass.
+prompts:
+  - "{{ reference }}"
+  - "Answer: {{ reference }}"
+
+providers:
+  - echo
+
+tests:
+  - description: baseline and candidate both pass
+    vars:
+      reference: fixture-answer
+    assert:
+      - type: contains
+        value: "{{ reference }}"
