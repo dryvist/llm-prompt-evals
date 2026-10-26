@@ -1,0 +1,16 @@
+description: Offline heldout comparison control where candidate scores below baseline
+
+prompts:
+  - "{{ reference }}"
+  - "{{ reference }} incorrect"
+
+providers:
+  - echo
+
+tests:
+  - description: baseline passes and candidate fails
+    vars:
+      reference: fixture-answer
+    assert:
+      - type: equals
+        value: "{{ reference }}"

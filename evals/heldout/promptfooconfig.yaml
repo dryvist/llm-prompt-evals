@@ -1,0 +1,19 @@
+description: Candidate versus baseline evaluation on Langfuse holdout items only
+
+prompts:
+  - file://{{ env.HELDOUT_BASELINE_PROMPT }}
+  - file://{{ env.HELDOUT_CANDIDATE_PROMPT }}
+
+providers: file://../../providers/openrouter.yaml
+
+tests:
+  - file://heldout.py:generate_tests
+
+defaultTest:
+  options:
+    provider:
+      id: openrouter:openai/gpt-4o-mini
+      config:
+        temperature: 0
+
+sharing: false
