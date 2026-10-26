@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.3.0...v0.4.0) (2026-10-26)
+
+
+### Features
+
+* **evals:** gate a candidate prompt on the held-out Langfuse dataset against its baseline ([#141](https://github.com/dryvist/llm-prompt-evals/issues/141)) ([d57f01a](https://github.com/dryvist/llm-prompt-evals/commit/d57f01a93c7aeaf261f5a3e9b7208abb6b0b25f2))
+
 ## [0.3.0](https://github.com/dryvist/llm-prompt-evals/compare/v0.2.0...v0.3.0) (2026-10-23)
 
 
