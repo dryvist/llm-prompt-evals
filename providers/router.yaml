@@ -1,0 +1,33 @@
+# Org OpenAI-compatible LLM router. Endpoint and key come from the environment.
+# The target role is the router alias already used by evals/auto-router.
+
+- id: openai:chat:medium
+  label: llm-router-medium
+  config:
+    apiBaseUrl: "{{ env.LLM_ROUTER_BASE_URL | default('http://llm-router-unset.invalid/v1', true) }}"
+    apiKeyEnvar: LLM_ROUTER_API_KEY
+    temperature: 0
+    tools:
+      - type: function
+        function:
+          name: get_weather
+          description: Get the current weather for a named location.
+          parameters:
+            type: object
+            properties:
+              location:
+                type: string
+                description: "City name, e.g. 'Portland'"
+            required: [location]
+            additionalProperties: false
+      - type: function
+        function:
+          name: search_docs
+          description: Full-text search over the internal documentation index.
+          parameters:
+            type: object
+            properties:
+              query:
+                type: string
+            required: [query]
+            additionalProperties: false

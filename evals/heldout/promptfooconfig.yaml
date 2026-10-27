@@ -4,7 +4,7 @@ prompts:
   - file://{{ env.HELDOUT_BASELINE_PROMPT }}
   - file://{{ env.HELDOUT_CANDIDATE_PROMPT }}
 
-providers: file://../../providers/openrouter.yaml
+providers: file://../../providers/router.yaml
 
 tests:
   - file://heldout.py:generate_tests
@@ -12,8 +12,10 @@ tests:
 defaultTest:
   options:
     provider:
-      id: openrouter:openai/gpt-4o-mini
+      id: openai:chat:small
       config:
+        apiBaseUrl: "{{ env.LLM_ROUTER_BASE_URL | default('http://llm-router-unset.invalid/v1', true) }}"
+        apiKeyEnvar: LLM_ROUTER_API_KEY
         temperature: 0
 
 sharing: false
