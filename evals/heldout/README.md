@@ -19,7 +19,16 @@ Set these in the local environment. Names are in `.env.example`.
   `<name>-holdout`. It rejects names ending in `-train` or `-holdout`.
 - `HELDOUT_BASELINE_PROMPT` and `HELDOUT_CANDIDATE_PROMPT`: prompt files.
   Index 0 is the baseline. Index 1 is the candidate.
-- `OPENROUTER_API_KEY`: the provider and grader key.
+- `LLM_ROUTER_BASE_URL`: the org router's OpenAI-compatible base URL, ending in
+  `/v1`. If it is unset or empty, both the eval target and the rubric grader
+  call `llm-router-unset.invalid`, which never resolves. The run fails. It does
+  not fall back to another endpoint.
+- `LLM_ROUTER_API_KEY`: the scoped router key used by the eval target and the
+  rubric grader.
+
+The eval target uses the router's `medium` alias. The same alias appears in
+`evals/auto-router/promptfooconfig.yaml`. The rubric grader uses the `small`
+alias. This repo has no earlier router grader alias to reuse.
 
 ## Usage
 
